@@ -16,6 +16,7 @@ export async function POST(req) {
   console.log("NEW POST JE :",newPost)
   const filePath = path.join(process.cwd(), "data", "nalozi.json");
   const fileData = await fs.readFile(filePath, "utf8");
+  console.log("FILE DATA JE:"  + fileData)
   const nalozi = JSON.parse(fileData);
   // Add new post with auto-increment id
   newPost.id = nalozi.length + 1;

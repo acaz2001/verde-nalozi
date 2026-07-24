@@ -45,31 +45,50 @@ const people = [
 
 function NalogKabinaCard({nalozi}) {
 
+
   return (
-      <ItemGroup className="w-full flex flex-col gap-5">
-            <Item key={nalozi.id} variant="outline" className="w-full mb-5">
+      <ItemGroup className="w-full flex flex-col gap-5 ">
+            <Item key={nalozi.id} variant="outline" className="w-full rounded-2xl
+             mb-5 bg-linear-to-r from-slate-200 via-gray-300 to-gray-400">
             
             <ItemContent className="gap-1">
-                <ItemTitle className='text-[18px]'>{nalozi.ime}</ItemTitle>
-                <ItemTitle>{nalozi.telefon}</ItemTitle>
-                <ItemDescription className='text-xl text-black font-bold'>
-                  {`${nalozi.proizvod} Širina:${nalozi.sirina}cm Dužina:${nalozi.duzina}cm`}
+                <div className='flex flex-row gap-4 items-center'>
+                  <ItemTitle className='text-[18px]'>{nalozi.ime}</ItemTitle>
+                  <ItemTitle className='text-[18px]'>{nalozi.telefon}</ItemTitle>
+                </div>
+                  <ItemDescription className='text-xl text-black font-bold'>
+                    {`Model Kabine:${nalozi.modelKabine.toUpperCase()} 
+                    ${nalozi.sirina != 0 ? `Širina:${nalozi.sirina}cm` : '' }
+                    ${nalozi.duzina != 0 ? `Duzina:${nalozi.duzina}cm` : '' }
+                    Visina:${nalozi.visina}cm`
+                    }
+                  </ItemDescription> 
+          
+                
+                <ItemDescription className='text-lg text-black font-bold'>
+                  {`Okov: ${nalozi.bojaOkova}`}
                 </ItemDescription>
-                <ItemDescription className='text-xl text-black font-bold'>
-                  {nalozi.obrada}
+                <ItemDescription className='text-lg text-black font-bold'>
+                  {`Staklo: ${nalozi.bojaStakla}`}
+                </ItemDescription>
+                <ItemDescription className='text-lg text-black font-bold'>
+                  {nalozi.montaza == "da" ? "Montira se" : "Bez montaže" }
+                </ItemDescription>
+                <ItemDescription className='text-sm text-black font-normal pr-5'>
+                  {nalozi.napomena != '' ? `Napomena: ${nalozi.napomena}` : null}
                 </ItemDescription>
                 <ItemTitle>{nalozi.datum}</ItemTitle>
             </ItemContent>
             <ItemActions>
                 <Link href={`/nalozi/${nalozi.id}`} target="_blank">
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button variant="ghost" size="icon" className="rounded-full cursor-pointer">
                       <Pencil />
                   </Button>
                 </Link>
-                <Button variant="ghost" size="icon" className="rounded-full">
+                <Button variant="ghost" size="icon" className="rounded-full cursor-pointer">
                     <Check />
                 </Button>
-                <Button variant="ghost" size="icon" className="rounded-full">
+                <Button variant="ghost" size="icon" className="rounded-full cursor-pointer">
                     <X />
                 </Button>
             

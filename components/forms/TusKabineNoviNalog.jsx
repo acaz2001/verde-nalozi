@@ -130,6 +130,7 @@ function TusKabineNoviNalog() {
 
     const form = useForm ({ defaultValues: {
         ime: "",
+        telefon: "",
         modelKabine: "v01",
         sirina: 0,
         duzina: 0,
@@ -196,6 +197,30 @@ function TusKabineNoviNalog() {
                     autoComplete="off"
                     required
                   />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="telefon"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-telefon">
+                    Broj telefona
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-telefon"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi broj telefona"
+                    autoComplete="telefon"
+                  />
+                  <FieldDescription>
+                    
+                  </FieldDescription>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}

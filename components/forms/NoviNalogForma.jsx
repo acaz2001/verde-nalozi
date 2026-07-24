@@ -180,11 +180,11 @@ export function NoviNalogForma() {
   
 
 
-  function onSubmit(data) {
-    console.log("data je:",data)
-  }
+  //function onSubmit(data) {
+    //console.log("data je:",data)
+  //}
 
-  {/*
+
     
     const onSubmit = async (data) => {
       const res = await fetch("api/nalozi", {
@@ -205,7 +205,7 @@ export function NoviNalogForma() {
   
       console.log("DATA JE: "+ data)
     }
-  */}
+
 
   const rupaValues = watch(form);
   const proizvod2Values = watch("proizvodiArray");

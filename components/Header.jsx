@@ -21,7 +21,7 @@ function Header() {
                 Nalozi
             </Button>
             </Link>
-            <Link href={'/tus-kabine'}>
+            <Link href={'/tus-kabine-nalozi'}>
             <Button className="cursor-pointer">
                 Tus kabine
             </Button>

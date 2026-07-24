@@ -15,7 +15,7 @@ export async function POST(req) {
   const newPost = await req.json();
   console.log("NEW POST JE :",newPost) // newPost je objekat sa podacima iz forme
   const filePath = path.join(process.cwd(), "data", "tusKabineNalozi.json");
-  const fileData = await fs.readFile(filePath, "utf8");
+  const fileData = await fs.readFile(filePath, "utf8"); //file data je array of objects za naloge
   console.log("FILE DATA JE:"  + fileData)
   const nalozi = JSON.parse(fileData);
   // Add new post with auto-increment id
