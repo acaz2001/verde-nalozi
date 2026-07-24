@@ -1,0 +1,1976 @@
+import React from 'react'
+
+import { PlusIcon, Check, X, Pencil  } from "lucide-react"
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemMedia,
+  ItemSeparator,
+  ItemTitle,
+} from "@/components/ui/item"
+import { maxLength } from 'zod'
+import Link from 'next/link'
+
+const people = [
+  {
+    ime: "Milos Milosevic",
+    telefon: "0603170707",
+    avatar: "https://github.com/shadcn.png",
+    proizvod: "Flot 8mm Kaljeno 80x250",
+  },
+  {
+    ime: "Slavica Djorovic",
+    telefon: "0603170707",
+    avatar: "https://github.com/maxleiter.png",
+    proizvod: "Ogledalo 4mm Fazeta 5mm 50x250",
+  },
+  {
+    ime: "Milica Todorovic",
+    avatar: "https://github.com/evilrabbit.png",
+    telefon: "0603170707",
+    proizvod: "Tus kabina Dupla Klizna 90x90",
+  },
+]
+
+
+function NalogKartica({nalozi}) {
+  console.log("NALOG KARTICA DATA JE:",nalozi)
+
+  return (
+    <div>
+      <ItemGroup className="w-full">
+            <Item key={nalozi.id} variant="outline" className="w-full">
+            
+            <ItemContent className="gap-1">
+                <ItemTitle className='text-[18px]'>{nalozi.ime}</ItemTitle>
+                <ItemTitle>{nalozi.telefon}</ItemTitle>
+                <ItemDescription className='text-xl text-black font-bold'>
+                  {`${nalozi.proizvod} Širina:${nalozi.sirina}cm Dužina:${nalozi.duzina}cm`}
+                </ItemDescription>
+                <ItemDescription className='text-xl text-black font-bold'>
+                  {nalozi.obrada}
+                </ItemDescription>
+                <ItemTitle>{nalozi.datum}</ItemTitle>
+            </ItemContent>
+            <ItemActions>
+                <Link href={`/nalozi/${nalozi.id}`} target="_blank">
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                      <Pencil />
+                  </Button>
+                </Link>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                    <Check />
+                </Button>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                    <X />
+                </Button>
+            
+            </ItemActions>
+            </Item>
+        
+        </ItemGroup>
+    </div>
+  )
+}
+
+
+export async function NalogKarticaZaObjekat({nalog}) {
+  //console.log("NALOG KARTICA DATA JE:",nalozi.data)
+
+  return (
+    <div>
+      <ItemGroup className="w-full">
+        
+            <Item key={nalog.ime} variant="outline" className="w-full">
+            
+            <ItemContent className="gap-1">
+                <ItemTitle className='text-[18px]'>{nalog.ime}</ItemTitle>
+                <ItemTitle>{nalog.telefon}</ItemTitle>
+                <ItemDescription className='text-xl text-black font-bold'>
+                  {`${nalog.proizvod} Širina:${nalog.sirina}cm Dužina:${nalog.duzina}cm`}
+                </ItemDescription>
+                <ItemDescription className='text-xl text-black font-bold'>
+                  {nalog.obrada}
+                </ItemDescription>
+                <ItemTitle>{nalog.datum}</ItemTitle>
+            </ItemContent>
+            <ItemActions>
+                <Link href={`/nalozi/${nalog.id}`} target="_blank">
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                      <Pencil />
+                  </Button>
+                </Link>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                    <Check />
+                </Button>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                    <X />
+                </Button>
+            
+            </ItemActions>
+            </Item>
+        
+        </ItemGroup>
+    </div>
+  )
+}
+
+export default NalogKartica
+
+
+
+
+
+///////////////////////////////
+"use client";
+
+import React, { useState } from "react";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import * as z from "zod";
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSet ,
+  FieldLegend 
+} from "@/components/ui/field"
+import { Input } from "../../components/ui/input"
+import {InputGroup,InputGroupInput,InputGroupAddon,InputGroupButton  } from "../../components/ui/input-group"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+  SelectGroup
+} from "@/components/ui/select"
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle,
+} from "@/components/ui/item"
+import { X } from 'lucide-react';
+import { id } from "zod/locales";
+
+
+
+const proizvodi = [
+  { label: "Flot 2mm", value: "flot2mm", obrade: [{ime: "Seceno na meru", value:"flot2mm-seceno2mm"},{ime: "KP Obrada", value: "flot2mm-obradaKp2mm"}] },
+  { label: "Flot 3mm", value: "flot3mm" ,obrade: [{ime: "Seceno na meru", value:"flot3mm-seceno3mm"},{ime: "KP Obrada", value: "flot3mm-obradaKp3mm"}] },
+  { label: "Flot 4mm", value: "flot4mm" ,obrade: [{ime: "Seceno na meru", value:"flot4mm-seceno4mm"},{ime: "KP Obrada", value: "flot4mm-obradaKp4mm"}] },
+  { label: "Flot 5mm", value: "flot5mm" ,obrade: [{ime: "Seceno na meru", value:"flot5mm-seceno5mm"},{ime: "KP Obrada", value: "flot5mm-obradaKp5mm"}] },
+  { label: "Flot 6mm", value: "flot6mm" ,obrade: [{ime: "Seceno na meru", value:"flot6mm-seceno6mm"},{ime: "KP Obrada", value: "flot6mm-obradaKp6mm"}] },
+  { label: "Flot 8mm", value: "flot8mm" ,obrade: [{ime: "Seceno na meru", value:"flot8mm-seceno8mm"},{ime: "KP Obrada", value: "flot8mm-obradaKp8mm"}] },
+  { label: "Flot 10mm", value: "flot10mm" ,obrade: [{ime: "Seceno na meru", value:"flot10mm-seceno10mm"},{ime: "KP Obrada", value: "flot10mm-obradaKp10mm"}] },
+] 
+
+const obrada = [
+  { label: "Seceno na meru", value: "seceno" },
+  { label: "KP Obrada", value: "obradaKp" },
+  { label: "Kaljeno", value: "kaljeno" },
+  { label: "Fazeta 5mm", value: "fazeta-5" },
+  { label: "Fazeta 10mm", value: "fazeta-10" },
+] 
+
+const rupe = [
+  { label: "⌀8mm", value: "rupa-8mm" },
+  { label: "⌀10mm", value: "rupa-10mm" },
+  { label: "⌀12mm", value: "rupa-12mm" },
+] 
+
+
+const formSchema = z.object({
+  ime: z
+    .string()
+    .min(3, "Ime must be at least 3 characters.")
+    //.regex(
+    //  /^[a-zA-Z0-9_]+$/,
+    //  "Ime mogu biti samo slova ne i brojevi."
+    //)
+    ,
+    proizvod: z
+        .string()
+        .min(1, "Obavezno je izabrati proizvod!")
+        .refine((val) => val !== "auto", {
+        message:
+            "Obavezno je izabrati proizvod!",
+    }),
+    obrada: z
+        .string()
+        .min(1, "Obavezno je izabrati obradu!")
+        .refine((val) => val !== "auto", {
+        message:
+            "Obavezno je izabrati obradu!",
+    }),
+    sirina: z
+    .coerce.number().refine((val) => val !== 0, {
+        message:
+            "Obavezno je uneti sirinu!",
+    })
+
+    ,
+    duzina: z
+    .coerce.number()
+    .refine((val) => val !== 0, {
+        message:
+            "Obavezno je uneti duzinu!",
+    })
+    ,
+
+    rupa: z.array(
+        z.object({
+        fiRupe: z
+            .string()
+            .min(1, "Izaberi fi rupe")
+            .refine((val) => val !== "auto", {
+            message: "Izaberi konkretnu opciju",
+            }),
+        })
+    ),
+
+    brojRupa: z
+    .coerce.number()
+})
+
+
+export function NoviNalogForma() {
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      ime: "",
+      proizvod: "",
+      obrada: "",
+      obrada2: "",
+      sirina: 0,
+      duzina: 0,
+      rupa: [{ fiRupe: "" }],
+      brojRupa:0
+    },
+  })
+  const [izabraniProizvod, setizabraniProizvod] = useState({
+    id: null
+  });
+
+  const handleProizvod = ({ target }) => {
+    const { name, value } = target;
+    setizabraniProizvod((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+    console.log('Izabrani prozivod je:'+izabraniProizvod)
+  };
+
+
+
+  console.log('Ovo je proizvodi 1 element:' + proizvodi[0].label)
+
+  const { control, register, handleSubmit, reset, watch, formState: { errors, isSubmitting } } = form;
+
+
+  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+    control: form.control,
+    name: "rupa",
+  })
+
+  //function onSubmit(data) {
+  //  console.log("data je:",data)
+  //}
+
+  const onSubmit = async (data) => {
+    const res = await fetch("api/nalozi", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json"
+      }
+      
+    } );
+
+    const result = await res.json();
+    if (!res.ok) {
+      // response status is not 2xx
+      alert("Submitting form failed!");
+      return;
+    }
+
+    console.log("DATA JE: "+ data)
+  }
+
+  const rupaValues = watch("rupa");
+
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Napravi novi nalog</CardTitle>
+        <CardDescription>
+          Popuni podatke ispod
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form id="form-rhf-input" onSubmit={form.handleSubmit(onSubmit)}>
+          <FieldGroup>
+            <Controller
+              name="ime"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-ime">
+                    Ime
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-ime"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi neko ime"
+                    autoComplete="ime"
+                  />
+                  <FieldDescription>
+                    This is your public display name. Must be between 3 and 10
+                    characters
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            {/* Proizvod */}
+            <Controller
+              name="proizvod"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  orientation="responsive"
+                  data-invalid={fieldState.invalid}
+                >
+                  <FieldContent>
+                    <FieldLabel htmlFor="form-rhf-input-proizvod">
+                      Izaberi proizvod
+                    </FieldLabel>
+                    <FieldDescription>
+                      Opadajući prozor za proizvode na stanju.
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    onChange = {handleProizvod}
+                  >
+                    <SelectTrigger
+                      id="form-rhf-input-proizvod"
+                      aria-invalid={fieldState.invalid}
+                      className="min-w-[120px]"
+                    >
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent position="item-aligned">
+                      <SelectItem value="auto">Auto</SelectItem>
+                      <SelectSeparator />
+                      {proizvodi.map((proizvod) => (
+                        <SelectItem key={proizvod.value} value={proizvod.value}>
+                          {proizvod.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
+            />
+            {/* KRAJ Proizvod */}
+            {/* OBRADA */}
+            <Controller
+              name="obrada"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                console.log("OVO JE FIELD STATE"+field.value),
+                <Field
+                  orientation="responsive"
+                  data-invalid={fieldState.invalid}
+                >
+                  <FieldContent>
+                    <FieldLabel htmlFor="form-rhf-input-obrada">
+                      Obrada
+                    </FieldLabel>
+                    <FieldDescription>
+                      Kp, fazeta
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger
+                      id="form-rhf-input-obrada"
+                      aria-invalid={fieldState.invalid}
+                      className="min-w-[120px]"
+                    >
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent position="item-aligned">
+                      <SelectItem value="auto">Auto</SelectItem>
+                      <SelectSeparator />
+                      {obrada.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
+            />
+            
+            {/* Sirina */}
+            <Controller
+              name="sirina"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-sirina">
+                    Sirina (cm)
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-sirina"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi u centimetrima"
+                    autoComplete="sirina"
+                    type="number"
+                  />
+                  <FieldDescription>
+                    Unesi sirinu u cm.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            {/* KRAJ Sirina */}
+            {/* Duzina */}
+            <Controller
+              name="duzina"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-duzina">
+                    Duzina (cm)
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-duzina"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi u centimetrima"
+                    autoComplete="duzina"
+                    type="number"
+                  />
+                  <FieldDescription>
+                    Unesi sirinu u cm.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            {/* KRAJ Duzina */}
+            {/* Rupe */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-base font-semibold">Rupe</h3>
+
+                    <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => append({ fiRupe: "" })}
+                    >
+                    Dodaj rupu
+                    </Button>
+                </div>
+
+                <FieldGroup>
+                    {fields.map((item, index) => {
+                      console.log("OVO JE FIELS" + item.fiRupe)
+                    const fieldError = errors.rupa?.[index]?.fiRupe
+
+                    return (
+                        <div
+                        key={item.id}
+                        className="flex items-start gap-3 rounded-xl border p-4"
+                        >
+                        <div className="flex-1">
+                            <Controller
+                            control={form.control}
+                            name={`rupa.${index}.fiRupe`}
+                            render={({ field }) => (
+                                <Field data-invalid={fieldError ? true : undefined}>
+                                <FieldLabel>Fi rupe #{index + 1}</FieldLabel>
+
+                                <Select
+                                    value={field.value}
+                                    onValueChange={field.onChange}
+                                >
+                                    <SelectTrigger aria-invalid={fieldError ? true : undefined}>
+                                    <SelectValue placeholder="Izaberi rupu" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                    {rupe.map((rupa) => (
+                                        <SelectItem key={rupa.value} value={rupa.value}>
+                                        {rupa.label}
+                                        </SelectItem>
+                                    ))}
+                                    </SelectContent>
+                                </Select>
+
+                                {fieldError && <FieldError>{fieldError.message}</FieldError>}
+                                </Field>
+                            )}
+                            />
+                        </div>
+
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={() => remove(index)}
+                            //disabled={fields.length === 1}
+                            disabled={isSubmitting || fields.length === 1}
+                            className="mt-7"
+                        >
+                            Obriši
+                        </Button>
+                        </div>
+                    )
+                    })}
+                </FieldGroup>
+            </div>
+            
+            {/* KRAJ Rupe */}
+            {/* Broj Rupa */}
+            <Controller
+              name="brojRupa"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-brojRupa">
+                    Broj rupa (kom)
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-brojRupa"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi neko brojRupa"
+                    autoComplete="brojRupa"
+                  />
+                  <FieldDescription>
+                    Unesi koliko ima rupa.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            {/* KRAJ Broj Rupa */}
+            
+          </FieldGroup>
+        </form>
+      </CardContent>
+
+
+      <CardFooter>
+        <Field orientation="horizontal">
+          <Button type="button" variant="outline" onClick={() => form.reset()}>
+            Reset
+          </Button>
+          <Button type="submit" form="form-rhf-input">
+            Save
+          </Button>
+        </Field>
+      </CardFooter>
+    </Card>
+  )
+}
+
+export default NoviNalogForma
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+
+
+"use client";
+
+import React, { useState } from "react";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import * as z from "zod";
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSet ,
+  FieldLegend 
+} from "@/components/ui/field"
+import { Input } from "../../components/ui/input"
+import {InputGroup,InputGroupInput,InputGroupAddon,InputGroupButton  } from "../../components/ui/input-group"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+  SelectGroup
+} from "@/components/ui/select"
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle,
+} from "@/components/ui/item"
+import { X } from 'lucide-react';
+import { id } from "zod/locales";
+
+
+
+const proizvodi = [
+  { label: "Flot 2mm", value: "flot2mm", obrade: [{ime: "Seceno na meru", value:"flot2mm-seceno2mm"},{ime: "KP Obrada", value: "flot2mm-obradaKp2mm"}] },
+  { label: "Flot 3mm", value: "flot3mm" ,obrade: [{ime: "Seceno na meru", value:"flot3mm-seceno3mm"},{ime: "KP Obrada", value: "flot3mm-obradaKp3mm"}] },
+  { label: "Flot 4mm", value: "flot4mm" ,obrade: [{ime: "Seceno na meru", value:"flot4mm-seceno4mm"},{ime: "KP Obrada", value: "flot4mm-obradaKp4mm"}] },
+  { label: "Flot 5mm", value: "flot5mm" ,obrade: [{ime: "Seceno na meru", value:"flot5mm-seceno5mm"},{ime: "KP Obrada", value: "flot5mm-obradaKp5mm"}] },
+  { label: "Flot 6mm", value: "flot6mm" ,obrade: [{ime: "Seceno na meru", value:"flot6mm-seceno6mm"},{ime: "KP Obrada", value: "flot6mm-obradaKp6mm"}] },
+  { label: "Flot 8mm", value: "flot8mm" ,obrade: [{ime: "Seceno na meru", value:"flot8mm-seceno8mm"},{ime: "KP Obrada", value: "flot8mm-obradaKp8mm"}] },
+  { label: "Flot 10mm", value: "flot10mm" ,obrade: [{ime: "Seceno na meru", value:"flot10mm-seceno10mm"},{ime: "KP Obrada", value: "flot10mm-obradaKp10mm"}] },
+] 
+
+const obrada = [
+  { label: "Seceno na meru", value: "seceno" },
+  { label: "KP Obrada", value: "obradaKp" },
+  { label: "Kaljeno", value: "kaljeno" },
+  { label: "Fazeta 5mm", value: "fazeta-5" },
+  { label: "Fazeta 10mm", value: "fazeta-10" },
+] 
+
+const rupe = [
+  { label: "⌀8mm", value: "rupa-8mm" },
+  { label: "⌀10mm", value: "rupa-10mm" },
+  { label: "⌀12mm", value: "rupa-12mm" },
+] 
+
+
+const formSchema = z.object({
+  ime: z
+    .string()
+    .min(3, "Ime must be at least 3 characters.")
+    //.regex(
+    //  /^[a-zA-Z0-9_]+$/,
+    //  "Ime mogu biti samo slova ne i brojevi."
+    //)
+    ,
+    proizvod: z
+        .string()
+        .min(1, "Obavezno je izabrati proizvod!")
+        .refine((val) => val !== "auto", {
+        message:
+            "Obavezno je izabrati proizvod!",
+    }),
+    obrada: z
+        .string()
+        .min(1, "Obavezno je izabrati obradu!")
+        .refine((val) => val !== "auto", {
+        message:
+            "Obavezno je izabrati obradu!",
+    }),
+    sirina: z
+    .coerce.number().refine((val) => val !== 0, {
+        message:
+            "Obavezno je uneti sirinu!",
+    })
+
+    ,
+    duzina: z
+    .coerce.number()
+    .refine((val) => val !== 0, {
+        message:
+            "Obavezno je uneti duzinu!",
+    })
+    ,
+
+    rupa: z.array(
+        z.object({
+        fiRupe: z
+            .string()
+            .min(1, "Izaberi fi rupe")
+            .refine((val) => val !== "auto", {
+            message: "Izaberi konkretnu opciju",
+            }),
+        })
+    ),
+
+    brojRupa: z
+    .coerce.number()
+})
+
+
+export function NoviNalogForma() {
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      ime: "",
+      proizvod: [{imeProizvoda:""}],
+      obrada: "",
+      obrada2: "",
+      sirina: 0,
+      duzina: 0,
+      rupa: [{ fiRupe: "" }],
+      brojRupa:0
+    },
+  })
+  const [izabraniProizvod, setizabraniProizvod] = useState({
+    id: null
+  });
+
+  const handleProizvod = ({ target }) => {
+    const { name, value } = target;
+    setizabraniProizvod((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+    console.log('Izabrani prozivod je:'+izabraniProizvod)
+  };
+
+
+
+  console.log('Ovo je proizvodi 1 element:' + proizvodi[0].label)
+
+  const { control, register, handleSubmit, reset, watch, formState: { errors, isSubmitting } } = form;
+
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "rupa",
+  })
+
+  const array2 = useFieldArray({
+    control: form.control,
+    name: "proizvod",
+  })
+
+  //function onSubmit(data) {
+  //  console.log("data je:",data)
+  //}
+
+  const onSubmit = async (data) => {
+    const res = await fetch("api/nalozi", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json"
+      }
+      
+    } );
+
+    const result = await res.json();
+    if (!res.ok) {
+      // response status is not 2xx
+      alert("Submitting form failed!");
+      return;
+    }
+
+    console.log("DATA JE: "+ data)
+  }
+
+  const rupaValues = watch("rupa");
+
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Napravi novi nalog</CardTitle>
+        <CardDescription>
+          Popuni podatke ispod
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form id="form-rhf-input" onSubmit={form.handleSubmit(onSubmit)}>
+          <FieldGroup>
+            <Controller
+              name="ime"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-ime">
+                    Ime
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-ime"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi neko ime"
+                    autoComplete="ime"
+                  />
+                  <FieldDescription>
+                    This is your public display name. Must be between 3 and 10
+                    characters
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            {/* Proizvod */}
+            <Controller
+              name="proizvod"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  orientation="responsive"
+                  data-invalid={fieldState.invalid}
+                >
+                  <FieldContent>
+                    <FieldLabel htmlFor="form-rhf-input-proizvod">
+                      Izaberi proizvod
+                    </FieldLabel>
+                    <FieldDescription>
+                      Opadajući prozor za proizvode na stanju.
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    onChange = {handleProizvod}
+                  >
+                    <SelectTrigger
+                      id="form-rhf-input-proizvod"
+                      aria-invalid={fieldState.invalid}
+                      className="min-w-[120px]"
+                    >
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent position="item-aligned">
+                      <SelectItem value="auto">Auto</SelectItem>
+                      <SelectSeparator />
+                      {proizvodi.map((proizvod) => (
+                        <SelectItem key={proizvod.value} value={proizvod.value}>
+                          {proizvod.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
+            />
+            {/* KRAJ Proizvod */}
+            {/* OBRADA */}
+            <Controller
+              name="obrada"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                console.log("OVO JE FIELD STATE"+field.value),
+                <Field
+                  orientation="responsive"
+                  data-invalid={fieldState.invalid}
+                >
+                  <FieldContent>
+                    <FieldLabel htmlFor="form-rhf-input-obrada">
+                      Obrada
+                    </FieldLabel>
+                    <FieldDescription>
+                      Kp, fazeta
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger
+                      id="form-rhf-input-obrada"
+                      aria-invalid={fieldState.invalid}
+                      className="min-w-[120px]"
+                    >
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent position="item-aligned">
+                      <SelectItem value="auto">Auto</SelectItem>
+                      <SelectSeparator />
+                      {obrada.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
+            />
+            
+            {/* Sirina */}
+            <Controller
+              name="sirina"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-sirina">
+                    Sirina (cm)
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-sirina"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi u centimetrima"
+                    autoComplete="sirina"
+                    type="number"
+                  />
+                  <FieldDescription>
+                    Unesi sirinu u cm.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            {/* KRAJ Sirina */}
+            {/* Duzina */}
+            <Controller
+              name="duzina"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-duzina">
+                    Duzina (cm)
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-duzina"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi u centimetrima"
+                    autoComplete="duzina"
+                    type="number"
+                  />
+                  <FieldDescription>
+                    Unesi sirinu u cm.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            {/* KRAJ Duzina */}
+            {/* Rupe */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-base font-semibold">Rupe</h3>
+
+                    <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => append({ fiRupe: "" })}
+                    >
+                    Dodaj rupu
+                    </Button>
+                </div>
+
+                <FieldGroup>
+                    {fields.map((item, index) => {
+                      console.log("OVO JE FIELS" + item.fiRupe)
+                    const fieldError = errors.rupa?.[index]?.fiRupe
+
+                    return (
+                        <div
+                        key={item.id}
+                        className="flex items-start gap-3 rounded-xl border p-4"
+                        >
+                        <div className="flex-1">
+                            <Controller
+                            control={form.control}
+                            name={`rupa.${index}.fiRupe`}
+                            render={({ field }) => (
+                                <Field data-invalid={fieldError ? true : undefined}>
+                                <FieldLabel>Fi rupe #{index + 1}</FieldLabel>
+
+                                <Select
+                                    value={field.value}
+                                    onValueChange={field.onChange}
+                                >
+                                    <SelectTrigger aria-invalid={fieldError ? true : undefined}>
+                                    <SelectValue placeholder="Izaberi rupu" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                    {rupe.map((rupa) => (
+                                        <SelectItem key={rupa.value} value={rupa.value}>
+                                        {rupa.label}
+                                        </SelectItem>
+                                    ))}
+                                    </SelectContent>
+                                </Select>
+
+                                {fieldError && <FieldError>{fieldError.message}</FieldError>}
+                                </Field>
+                            )}
+                            />
+                        </div>
+
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={() => remove(index)}
+                            //disabled={fields.length === 1}
+                            disabled={isSubmitting || fields.length === 1}
+                            className="mt-7"
+                        >
+                            Obriši
+                        </Button>
+                        </div>
+                    )
+                    })}
+                </FieldGroup>
+            </div>
+            
+            {/* KRAJ Rupe */}
+            {/* Broj Rupa */}
+            <Controller
+              name="brojRupa"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-brojRupa">
+                    Broj rupa (kom)
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-brojRupa"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi neko brojRupa"
+                    autoComplete="brojRupa"
+                  />
+                  <FieldDescription>
+                    Unesi koliko ima rupa.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            {/* KRAJ Broj Rupa */}
+            
+          </FieldGroup>
+        </form>
+      </CardContent>
+
+
+      <CardFooter>
+        <Field orientation="horizontal">
+          <Button type="button" variant="outline" onClick={() => form.reset()}>
+            Reset
+          </Button>
+          <Button type="submit" form="form-rhf-input">
+            Save
+          </Button>
+        </Field>
+      </CardFooter>
+    </Card>
+  )
+}
+
+export default NoviNalogForma
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+
+"use client";
+
+import React, { useState } from "react";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import * as z from "zod";
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSet ,
+  FieldLegend 
+} from "@/components/ui/field"
+import { Input } from "../../components/ui/input"
+import {InputGroup,InputGroupInput,InputGroupAddon,InputGroupButton  } from "../../components/ui/input-group"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+  SelectGroup
+} from "@/components/ui/select"
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle,
+} from "@/components/ui/item"
+import { X } from 'lucide-react';
+import { id } from "zod/locales";
+
+
+
+const proizvodi = [
+  { label: "Flot 2mm", value: "flot2mm", obrade: [{ime: "Seceno na meru", value:"flot2mm-seceno2mm"},{ime: "KP Obrada", value: "flot2mm-obradaKp2mm"}] },
+  { label: "Flot 3mm", value: "flot3mm" ,obrade: [{ime: "Seceno na meru", value:"flot3mm-seceno3mm"},{ime: "KP Obrada", value: "flot3mm-obradaKp3mm"}] },
+  { label: "Flot 4mm", value: "flot4mm" ,obrade: [{ime: "Seceno na meru", value:"flot4mm-seceno4mm"},{ime: "KP Obrada", value: "flot4mm-obradaKp4mm"}] },
+  { label: "Flot 5mm", value: "flot5mm" ,obrade: [{ime: "Seceno na meru", value:"flot5mm-seceno5mm"},{ime: "KP Obrada", value: "flot5mm-obradaKp5mm"}] },
+  { label: "Flot 6mm", value: "flot6mm" ,obrade: [{ime: "Seceno na meru", value:"flot6mm-seceno6mm"},{ime: "KP Obrada", value: "flot6mm-obradaKp6mm"}] },
+  { label: "Flot 8mm", value: "flot8mm" ,obrade: [{ime: "Seceno na meru", value:"flot8mm-seceno8mm"},{ime: "KP Obrada", value: "flot8mm-obradaKp8mm"}] },
+  { label: "Flot 10mm", value: "flot10mm" ,obrade: [{ime: "Seceno na meru", value:"flot10mm-seceno10mm"},{ime: "KP Obrada", value: "flot10mm-obradaKp10mm"}] },
+] 
+
+const obrada = [
+  { label: "Seceno na meru", value: "seceno" },
+  { label: "KP Obrada", value: "obradaKp" },
+  { label: "Kaljeno", value: "kaljeno" },
+  { label: "Fazeta 5mm", value: "fazeta-5" },
+  { label: "Fazeta 10mm", value: "fazeta-10" },
+] 
+
+const rupe = [
+  { label: "⌀8mm", value: "rupa-8mm" },
+  { label: "⌀10mm", value: "rupa-10mm" },
+  { label: "⌀12mm", value: "rupa-12mm" },
+] 
+
+
+{/* 
+const formSchema = z.object({
+  ime: z
+    .string()
+    .min(3, "Ime must be at least 3 characters.")
+    //.regex(
+    //  /^[a-zA-Z0-9_]+$/,
+    //  "Ime mogu biti samo slova ne i brojevi."
+    //)
+    ,
+    proizvod: z
+        .string()
+        .min(1, "Obavezno je izabrati proizvod!")
+        .refine((val) => val !== "auto", {
+        message:
+            "Obavezno je izabrati proizvod!",
+    }),
+    obrada: z
+        .string()
+        .min(1, "Obavezno je izabrati obradu!")
+        .refine((val) => val !== "auto", {
+        message:
+            "Obavezno je izabrati obradu!",
+    }),
+    sirina: z
+    .coerce.number().refine((val) => val !== 0, {
+        message:
+            "Obavezno je uneti sirinu!",
+    })
+
+    ,
+    duzina: z
+    .coerce.number()
+    .refine((val) => val !== 0, {
+        message:
+            "Obavezno je uneti duzinu!",
+    })
+    ,
+
+    rupa: z.array(
+        z.object({
+        fiRupe: z
+            .string()
+            .min(1, "Izaberi fi rupe")
+            .refine((val) => val !== "auto", {
+            message: "Izaberi konkretnu opciju",
+            }),
+        })
+    ),
+
+    brojRupa: z
+    .coerce.number()
+})
+*/}
+
+export function NoviNalogForma() {
+  const form = useForm({
+    //resolver: zodResolver(formSchema),
+    defaultValues: {
+      ime: "",
+      telefon: "",
+      proizvod: "",
+      proizvod2: [{imeProizvoda:"",obradaProizvoda: "", sirinaProizvoda: 0, duzinaProizvoda: 0,
+        fiRupeProizvoda: "", brojRupaProizvoda: 0}],
+      obrada: "",
+      sirina: 0,
+      duzina: 0,
+      rupa: [{ fiRupe: "" }],
+      brojRupa:0
+    },
+  })
+  const [izabraniProizvod, setizabraniProizvod] = useState({
+    id: null
+  });
+
+  const handleProizvod = ({ target }) => {
+    const { name, value } = target;
+    setizabraniProizvod((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+   
+  };
+
+
+
+ 
+
+  const { control, register, handleSubmit, reset, watch, formState: { errors, isSubmitting } } = form;
+
+
+  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+    control: form.control,
+    name: "rupa",
+  })
+
+  const proizvodiArray = useFieldArray({
+    control: form.control,
+    name: "proizvod2",
+  })
+
+  const proizvodiArrayRupe = useFieldArray({
+    control: form.control,
+    name: "proizvodiArrayRupe",
+  })
+
+
+  function onSubmit(data) {
+    console.log("data je:",data)
+  }
+
+  {/*
+    
+    const onSubmit = async (data) => {
+      const res = await fetch("api/nalozi", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json"
+        }
+        
+      } );
+  
+      const result = await res.json();
+      if (!res.ok) {
+        // response status is not 2xx
+        alert("Submitting form failed!");
+        return;
+      }
+  
+      console.log("DATA JE: "+ data)
+    }
+  */}
+
+  const rupaValues = watch(form);
+  const proizvod2Values = watch("proizvodiArray");
+
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Napravi novi nalog</CardTitle>
+        <CardDescription>
+          Popuni podatke ispod
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form id="form-rhf-input" onSubmit={form.handleSubmit(onSubmit)}>
+          <FieldGroup>
+            <Controller
+              name="ime"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-ime">
+                    Ime
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-ime"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi neko ime"
+                    autoComplete="ime"
+                  />
+                  <FieldDescription>
+                    
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="telefon"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-telefon">
+                    Broj telefona
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-telefon"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi broj telefona"
+                    autoComplete="telefon"
+                  />
+                  <FieldDescription>
+                    
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            {/* Proizvod */}
+            <Controller
+              name="proizvod"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  orientation="responsive"
+                  data-invalid={fieldState.invalid}
+                >
+                  <FieldContent>
+                    <FieldLabel htmlFor="form-rhf-input-proizvod">
+                      Izaberi proizvod
+                    </FieldLabel>
+                    <FieldDescription>
+                      Opadajući prozor za proizvode na stanju.
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    onChange = {handleProizvod}
+                  >
+                    <SelectTrigger
+                      id="form-rhf-input-proizvod"
+                      aria-invalid={fieldState.invalid}
+                      className="min-w-[120px]"
+                    >
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent position="item-aligned">
+                      <SelectItem value="auto">Auto</SelectItem>
+                      <SelectSeparator />
+                      {proizvodi.map((proizvod) => (
+                        <SelectItem key={proizvod.value} value={proizvod.value}>
+                          {proizvod.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
+            />
+            {/* KRAJ Proizvod */}
+            {/* OBRADA */}
+            <Controller
+              name="obrada"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                
+                <Field
+                  orientation="responsive"
+                  data-invalid={fieldState.invalid}
+                >
+                  <FieldContent>
+                    <FieldLabel htmlFor="form-rhf-input-obrada">
+                      Obrada
+                    </FieldLabel>
+                    <FieldDescription>
+                      Kp, fazeta
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger
+                      id="form-rhf-input-obrada"
+                      aria-invalid={fieldState.invalid}
+                      className="min-w-[120px]"
+                    >
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent position="item-aligned">
+                      <SelectItem value="auto">Auto</SelectItem>
+                      <SelectSeparator />
+                      {obrada.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
+            />
+            
+            {/* Sirina */}
+            <Controller
+              name="sirina"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-sirina">
+                    Sirina (cm)
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-sirina"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi u centimetrima"
+                    autoComplete="sirina"
+                    type="number"
+                  />
+                  <FieldDescription>
+                    Unesi sirinu u cm.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            {/* KRAJ Sirina */}
+            {/* Duzina */}
+            <Controller
+              name="duzina"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-duzina">
+                    Duzina (cm)
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-duzina"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi u centimetrima"
+                    autoComplete="duzina"
+                    type="number"
+                  />
+                  <FieldDescription>
+                    Unesi sirinu u cm.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            {/* KRAJ Duzina */}
+            {/* Rupe */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-base font-semibold">Rupe</h3>
+
+                    <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => append({ fiRupe: "" })}
+                    >
+                    Dodaj rupu
+                    </Button>
+                </div>
+
+                <FieldGroup>
+                    {fields.map((item, index) => {
+                      
+                    const fieldError = errors.rupa?.[index]?.fiRupe
+
+                    return (
+                        <div
+                        key={item.id}
+                        className="flex items-start gap-3 rounded-xl border p-4"
+                        >
+                        <div className="flex-1">
+                            <Controller
+                            control={form.control}
+                            name={`rupa.${index}.fiRupe`}
+                            render={({ field }) => (
+                                <Field data-invalid={fieldError ? true : undefined}>
+                                <FieldLabel>Fi rupe #{index + 1}</FieldLabel>
+
+                                <Select
+                                    value={field.value}
+                                    onValueChange={field.onChange}
+                                >
+                                    <SelectTrigger aria-invalid={fieldError ? true : undefined}>
+                                    <SelectValue placeholder="Izaberi rupu" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                    {rupe.map((rupa) => (
+                                        <SelectItem key={rupa.value} value={rupa.value}>
+                                        {rupa.label}
+                                        </SelectItem>
+                                    ))}
+                                    </SelectContent>
+                                </Select>
+
+                                {fieldError && <FieldError>{fieldError.message}</FieldError>}
+                                </Field>
+                            )}
+                            />
+                        </div>
+
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={() => remove(index)}
+                            //disabled={fields.length === 1}
+                            disabled={isSubmitting || fields.length === 1}
+                            className="mt-7"
+                        >
+                            Obriši
+                        </Button>
+                        </div>
+                    )
+                    })}
+                </FieldGroup>
+            </div>
+            
+            {/* KRAJ Rupe */}
+            {/* Broj Rupa */}
+            <Controller
+              name="brojRupa"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-brojRupa">
+                    Broj rupa (kom)
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-brojRupa"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi neko brojRupa"
+                    autoComplete="brojRupa"
+                  />
+                  <FieldDescription>
+                    Unesi koliko ima rupa.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            {/* KRAJ Broj Rupa */}
+
+            {/*PROIZVOD2 */}
+            
+           
+          <FieldGroup>
+            {proizvodiArray.fields.map((item, index) => {
+                      
+                    const fieldError = errors.proizvod2?.[index]?.imeProizvoda 
+            return (
+              
+              
+              <div key={item.id} className="flex flex-col items-start w-full gap-5 border-b-amber-400 border-b-1 pb-5">   
+                <div className="flex flex-row justify-between w-full gap-3 "> 
+                  <Controller
+                  
+                    control={form.control}
+                    name={`proizvod2.${index}.imeProizvoda`}
+                    render={({ field }) => (
+                      
+                        <Field data-invalid={fieldError ? true : undefined}>
+                        <FieldLabel>Proizvod {index + 1}</FieldLabel>
+
+                        <Select
+                            name = {field.name}
+                            value={field.value}
+                            onValueChange={field.onChange}
+                        >
+                            <SelectTrigger aria-invalid={fieldError ? true : undefined}>
+                            <SelectValue placeholder="Izaberi proizvod" />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                            {proizvodi.map((p) => (
+                                <SelectItem key={p.value} value={p.value}>
+                                {p.label}
+                                </SelectItem>
+                            ))}
+                            </SelectContent>
+                        </Select>
+
+                        {fieldError && <FieldError>{fieldError.message}</FieldError>}
+                        </Field>
+                    )}
+                    />
+                    <Controller
+                      control={form.control}
+                      name={`proizvod2.${index}.obradaProizvoda`}
+                      render={({ field }) => (
+                        
+                          <Field data-invalid={fieldError ? true : undefined}>
+                          <FieldLabel>Obrada za {index + 1} proizvod</FieldLabel>
+
+                          <Select
+                              name = {field.name}
+                              value={field.value}
+                              onValueChange={field.onChange}
+                          >
+                              <SelectTrigger aria-invalid={fieldError ? true : undefined}>
+                              <SelectValue placeholder="Izaberi obradu" />
+                              </SelectTrigger>
+
+                              <SelectContent>
+                              {obrada.map((o) => (
+                                  <SelectItem key={o.value} value={o.value}>
+                                  {o.label}
+                                  </SelectItem>
+                              ))}
+                              </SelectContent>
+                          </Select>
+
+                          {fieldError && <FieldError>{fieldError.message}</FieldError>}
+                          </Field>
+                    )}
+                    />
+                    <Controller
+                      //key={item.id}
+                      name={`proizvod2.${index}.sirinaProizvoda`}
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldLabel htmlFor="form-rhf-input-sirinaProizvoda">
+                             {`Širina za ${index+1} proizvod`}
+                          </FieldLabel>
+                          <Input
+                            {...field}
+                            id="form-rhf-input-sirinaProizvoda"
+                            aria-invalid={fieldState.invalid}
+                            placeholder="Unesi širinu"
+                            autoComplete="sirina"
+                           
+                          />
+                          <FieldDescription>
+                            Unesi dimenziju u centimetrima
+                          </FieldDescription>
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
+                    />
+                    <Controller
+                      name={`proizvod2.${index}.duzinaProizvoda`}
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldLabel htmlFor="form-rhf-input-duzinaProizvoda">
+                            {`Dužina za ${index+1} proizvod`}
+                          </FieldLabel>
+                          <Input
+                            {...field}
+                            id="form-rhf-input-duzinaProizvoda"
+                            aria-invalid={fieldState.invalid}
+                            placeholder="Unesi dužinu"
+                            autoComplete="duzina"
+                          />
+                          <FieldDescription>
+                            Unesi dimenziju u centimetrima
+                          </FieldDescription>
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
+                    />
+                      <Button
+                              type="button"
+                              variant="destructive"
+                              onClick={() => proizvodiArray.remove(index)}
+                              //disabled={fields.length === 1}
+                              disabled={isSubmitting || proizvodiArray.fields.length === 1}
+                              className="mt-7"
+                          >
+                              Obriši
+                      </Button>
+                    </div>
+                    <div className="flex flex-row">
+                      <Controller
+                        control={form.control}
+                        name={`proizvod2.${index}.fiRupeProizvoda`}
+                        render={({ field }) => (
+                          
+                            <Field data-invalid={fieldError ? true : undefined}>
+                            <FieldLabel>Rupa za {index + 1} proizvod</FieldLabel>
+
+                            <Select
+                                name = {field.name}
+                                value={field.value}
+                                onValueChange={field.onChange}
+                            >
+                                <SelectTrigger aria-invalid={fieldError ? true : undefined}>
+                                <SelectValue placeholder="Izaberi fi rupe" />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                {rupe.map((r) => (
+                                    <SelectItem key={r.value} value={r.value}>
+                                    {r.label}
+                                    </SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+
+                            {fieldError && <FieldError>{fieldError.message}</FieldError>}
+                            </Field>
+                      )}
+                      />
+                      <Controller
+                        name={`proizvod2.${index}.brojRupaProizvoda`}
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel htmlFor="form-rhf-input-brojRupaProizvoda">
+                              Širina
+                            </FieldLabel>
+                            <Input
+                              {...field}
+                              id="form-rhf-input-rupeProizvoda.brojRupaProizvoda"
+                              aria-invalid={fieldState.invalid}
+                              placeholder="Unesi broj rupa"
+                              autoComplete="sirina"
+                            />
+                            <FieldDescription>
+                              
+                            </FieldDescription>
+                            {fieldState.invalid && (
+                              <FieldError errors={[fieldState.error]} />
+                            )}
+                          </Field>
+                        )}
+                      />
+                      <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => proizvodiArrayRupe.append ({fiRupeProizvoda: "", brojRupaProizvoda: 0})}
+                          >
+                          Dodaj rupu
+                      </Button>
+                    </div>
+                    
+                        
+                    
+               
+                
+              </div>
+              
+              
+            )}
+            
+            )}
+            <Button
+                type="button"
+                variant="outline"
+                onClick={() => proizvodiArray.append ({imeProizvoda:"",obradaProizvoda: ""})}
+                >
+                Dodaj proizvod
+            </Button>
+          </FieldGroup>
+            
+            {/*KRAJ PROIZVOD2 */}
+          </FieldGroup>
+        </form>
+      </CardContent>
+
+
+      <CardFooter>
+        <Field orientation="horizontal">
+          <Button type="button" variant="outline" onClick={() => form.reset()}>
+            Reset
+          </Button>
+          <Button type="submit" form="form-rhf-input">
+            Save
+          </Button>
+        </Field>
+      </CardFooter>
+    </Card>
+  )
+}
+
+
+export function Proizvod () {
+  return (
+    <div>
+        <Controller
+          control={form.control}
+          name={`proizvod2.${index}.imeProizvod`}
+          render={({ field }) => (
+            
+              <Field data-invalid={fieldError ? true : undefined}>
+              <FieldLabel>Proizvod {index + 1}</FieldLabel>
+
+              <Select
+                  name = {field.name}
+                  value={field.value}
+                  onValueChange={field.onChange}
+              >
+                  <SelectTrigger aria-invalid={fieldError ? true : undefined}>
+                  <SelectValue placeholder="Izaberi rupu" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                  {proizvodi.map((p) => (
+                      <SelectItem key={p.value} value={p.value}>
+                      {p.label}
+                      </SelectItem>
+                  ))}
+                  </SelectContent>
+              </Select>
+
+              {fieldError && <FieldError>{fieldError.message}</FieldError>}
+              </Field>
+          )}
+          />
+    </div>
+  )
+}
+
+const ProizvodRupe = () => {
+  const {
+      register,
+      control,
+      formState: { errors },
+    } = useForm()
+
+  const { append, remove, fields } = useFieldArray({
+    name: 'proizvodRupe',
+    control,
+  })
+
+  return (
+    <div>
+      {fields.map((chapter, chapterIndex) => {
+        return (
+          <div key={chapter.id}>
+              
+          </div>
+        )
+      } )}
+    </div>
+  )
+}
+
+export default NoviNalogForma
+
+
+//////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
