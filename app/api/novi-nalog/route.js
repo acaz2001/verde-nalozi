@@ -28,15 +28,15 @@ export async function POST(request) {
 }
 
 
-export async function GET(request) {
-    const res = await fetch('http://localhost:3000/api/novi-nalog', {
-    method:"GET",
-    body: JSON.stringify
-  })
-  const data = await res.json()
+// export async function GET(request) {
+//     const res = await fetch('http://localhost:3000/api/novi-nalog', {
+//     method:"GET",
+//     body: JSON.stringify
+//   })
+//   const data = await res.json()
  
-  //return Response.json({ data })
+//   //return Response.json({ data })
     
-return NextResponse.json({ message: 'Hello, World!', proizvod: 'Flot 4mm', obrada: "KP obrada" });
+// return NextResponse.json({ message: 'Hello, World!', proizvod: 'Flot 4mm', obrada: "KP obrada" });
 
-}
+// }
