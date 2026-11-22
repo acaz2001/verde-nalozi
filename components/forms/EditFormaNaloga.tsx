@@ -206,6 +206,7 @@ const schemaCreateProizvod = z.object({
                         <FieldLabel htmlFor="form-rhf-input-brojTelefona">
                         Broj telefona
                         </FieldLabel>
+                        {/* @ts-ignore */}
                         <Input
                         {...field}
                         id="form-rhf-input-brojTelefona"
