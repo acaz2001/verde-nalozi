@@ -1,0 +1,42 @@
+[
+    {
+        "ime": "Kosta Djordjevic",
+        "telefon": "0635547896",
+        "nalozi": [
+            {
+                "ime": "Kosta Djordjevic",
+                "telefon": "0635547896",
+                "modelKabine": "v27",
+                "sirina": "50",
+                "duzina": "50",
+                "visina": 200,
+                "bojaStakla": "providno",
+                "bojaOkova": "sivo",
+                "montaza": "da",
+                "napomena": "",
+                "cena": 250,
+                "datum": "Jul 15.2026",
+                "stanjeNaloga": "uradjen",
+                "id": 8
+            },
+            {
+                "ime": "Aleksandar Zivkovic",
+                "telefon": "021065",
+                "modelKabine": "v01",
+                "sirina": "120",
+                "duzina": 0,
+                "visina": 200,
+                "bojaStakla": "matirano",
+                "bojaOkova": "zlatniMat",
+                "montaza": "da",
+                "napomena": "",
+                "datum": "Septembar 22 2026",
+                "cena": 350,
+                "stanjeNaloga": "nijeUradjen",
+                "id": 12
+            }
+        ],
+        "naloziRef":{ "$ref": "tusKabineNalozi.json" },
+        "id": 1
+    }
+]

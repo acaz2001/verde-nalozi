@@ -11,9 +11,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { useDebouncedCallback } from 'use-debounce';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 
 export default function Kalendar() {
   const [date, setDate] = useState()
+
+  console.log("DATE JE:",date);
+  
 
   return (
     <Popover>

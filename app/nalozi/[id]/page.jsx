@@ -1,6 +1,7 @@
 import React from 'react'
-import { NalogKarticaZaObjekat } from '../../../components/NalogKartica';
+import NalogKartica, { NalogKarticaZaObjekat } from '../../../components/NalogKartica';
 import EditFormaNaloga from '../../../components/forms/EditFormaNaloga';
+import { FormProviderCreateCourse } from '../../../components/forms/forms';
 
 
 async function getNalogId(id) {
@@ -20,8 +21,14 @@ async function Nalog({params}) {
   return (
     <div className='w-full'>
         <main className='max-w-[1650px] mx-auto mt-20'>
-            <NalogKarticaZaObjekat nalog={nalog}/>
-            <EditFormaNaloga nalog={nalog}/>
+            {/* <NalogKarticaZaObjekat nalog={nalog}/> */}
+            <div className='px-5'>
+              <NalogKartica nalozi={nalog} key={nalog._id}/>
+            </div>
+            <FormProviderCreateCourse>
+              <EditFormaNaloga nalog={nalog}/>
+            </FormProviderCreateCourse>
+            
         </main>
       
     </div>

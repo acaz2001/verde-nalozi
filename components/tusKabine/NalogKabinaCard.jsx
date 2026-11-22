@@ -1,12 +1,7 @@
-import React from 'react'
+'use client'
+import React, { useState } from 'react'
+import { BanknoteArrowUp, Check, X, Pencil, Ban, CircleUserRound,ChevronDownIcon, MirrorRectangular, PencilRuler  } from "lucide-react"
 
-import { PlusIcon, Check, X, Pencil  } from "lucide-react"
-
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
   Item,
@@ -20,6 +15,18 @@ import {
 } from "@/components/ui/item"
 import { maxLength } from 'zod'
 import Link from 'next/link'
+import { promenaStanjaNaloga, promenaStanjaNalogaNijeUradjen } from '../../actions/action'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../ui/collapsible"
+
 
 const people = [
   {
@@ -43,102 +50,227 @@ const people = [
 ]
 
 
+
+
 function NalogKabinaCard({nalozi}) {
+  const [open, setOpen] = useState(false)
+
+
+  const deleteNalog = async (nalogId) => {
+    const response = await fetch(`http://localhost:3000/api/tus-kabine-nalozi/${nalogId}`, {
+      method: 'DELETE',
+    })
+    const data = await response.json()
+    console.log("DELETE DATA:",  data)
+
+  }
+
+  const handlePromenaStanjaNaloga = async(id) => {
+    await promenaStanjaNaloga(id)
+  }
+
+  const handlePromenaStanjaNalogaNijeUradjen = async(id) => {
+    await promenaStanjaNalogaNijeUradjen(id)
+  }
+
+  //const gotovNalog = async()
+
+  console.log("NALOZIII,",nalozi.stanjeNaloga)
 
 
   return (
-      <ItemGroup className="w-full flex flex-col gap-5 ">
-            <Item key={nalozi.id} variant="outline" className="w-full rounded-2xl
-             mb-5 bg-linear-to-r from-slate-200 via-gray-300 to-gray-400">
-            
-            <ItemContent className="gap-1">
-                <div className='flex flex-row gap-4 items-center'>
-                  <ItemTitle className='text-[18px]'>{nalozi.ime}</ItemTitle>
-                  <ItemTitle className='text-[18px]'>{nalozi.telefon}</ItemTitle>
+        <ItemGroup className="w-full  flex flex-col gap-5 relative hover:scale-101 overflow-visible 
+              transition-all duration-200 cursor-pointer border border-gray-400 my-5 rounded-2xl"
+              key={nalozi._id}>    
+            <Collapsible open={open} onOpenChange={setOpen} 
+            className=" rounded-md  w-full md:p-5 p-2" >
+              <CollapsibleTrigger className='w-full '> 
+              <Button variant="ghost" className="w-full cursor-pointer">
+                <div className='flex flex-row gap-2 items-center'>
+                  <ItemTitle className='md:text-2xl text-xl text-gray-500'>
+                    <span><CircleUserRound/></span>
+                    {nalozi.ime}
+                  </ItemTitle>
+                  <ItemTitle className='md:text-2xl text-xl text-gray-500'>
+                    / {nalozi.telefon}
+                  </ItemTitle>
+                  <ItemTitle className='text-2xl text-gray-500 md:block hidden'>
+                    / Ukupna cena tuš kabine: {nalozi.cena} €
+                  </ItemTitle>
+                  {/* <ItemTitle className='text-[18px]'>{nalozi.stanjeNaloga}</ItemTitle> */}
                 </div>
-                  <ItemDescription className='text-xl text-black font-bold'>
-                    {`Model Kabine:${nalozi.modelKabine.toUpperCase()} 
-                    ${nalozi.sirina != 0 ? `Širina:${nalozi.sirina}cm` : '' }
-                    ${nalozi.duzina != 0 ? `Duzina:${nalozi.duzina}cm` : '' }
-                    Visina:${nalozi.visina}cm`
-                    }
-                  </ItemDescription> 
+                <ChevronDownIcon className="ml-auto group-data-panel-open/button:rotate-180" />
+              </Button>
+            </CollapsibleTrigger>   
+            <CollapsibleContent> 
+              <Item className="md:w-full w-full rounded-3xl relative mb-5 bg-transparent p-0">
+              <main className={`md:gap-5 gap-2 flex md:flex-row flex-col flex-col-reverse w-full rounded-3xl relative md:mt-0 mt-3`}>
+              
+              <ItemContent className={`w-full md:p-5 p-3 md:gap-8 gap-5 rounded-2xl ${nalozi.stanjeNaloga === 'nijeUradjen' ? 'bg-[#f0f0f06f]' : 'bg-green-200' }`}>
+                <section className='md:text-4xl text-2xl font-semibold tracking-wide bg-amber-400
+                rounded-2xl p-3 md:mb-8 mb-0 flex flex-row justify-between w-full'>
+                  <h1 className='flex flex-row justify-between'>
+                    Kabina {nalozi.modelKabine}:
+                  </h1>
+                  <h1>
+                    {nalozi.cena} €
+                  </h1>
+                </section>
+
+                <section className='flex flex-col items-start gap-1.5'>
+                  <div className='flex flex-row gap-1.5'>
+                    <PencilRuler  className='md:text-lg text-base'/>
+                    <ItemDescription className='font-medium md:text-xl text-lg text-wrap text-black'>
+                    {`${nalozi.sirina != 0 ? `Širina:${nalozi.sirina}cm` : '' } 
+                    / ${nalozi.duzina != 0 ? `Duzina:${nalozi.duzina}cm` : '' }
+                    Visina:${nalozi.visina}cm`}
+                    </ItemDescription>
+                  </div>
+                  {nalozi.brojKabina && 
+                    <div>
+                      <ItemTitle className='font-bold md:text-xl text-base text-nowrap'>
+                        Broj kabina: <span className='font-medium'>{nalozi.brojKabina} kom.</span>
+                      </ItemTitle>
+                    </div>
+                  }
+                </section>
           
+                  <div className='flex flex-col gap-0'>
+                    <ItemDescription className='font-medium md:text-xl text-base text-nowrap text-black'>
+                      {`Okov: ${nalozi.bojaOkova}`}
+                    </ItemDescription>
+                    <ItemDescription className='font-medium md:text-xl text-base text-nowrap text-black'>
+                      {`Staklo: ${nalozi.bojaStakla}`}
+                    </ItemDescription>
+                    <ItemDescription className='mt-2 text-lg text-black font-bold'>
+                      {nalozi.montaza == "da" ? "Montira se" : "Bez montaže" }
+                    </ItemDescription>
+                  </div>
+
+                  <section className='bg-blue-100 rounded-xl p-3 flex flex-col gap-2'>
+                    <ItemTitle className='font-medium md:text-xl text-base text-nowrap'>
+                      Napomena*
+                    </ItemTitle>
+                    <ItemDescription className='md:text-base text-sm h-auto'>
+                      {nalozi.napomena}
+                    </ItemDescription>
+                  </section>
+
+                  <section className='flex flex-col items-start gap-1.5 w-full'>
+                    {nalozi.dodatniTroskovi != 0 ?
+                    <>
+                      <div className='flex flex-row items-center gap-1.5 w-full'>
+                        <div className='flex flex-row items-center gap-1.5'>
+                          <BanknoteArrowUp/> 
+                          <ItemTitle className='font-medium md:text-xl text-base text-nowrap'>
+                            Dodatno za naplatu:
+                          </ItemTitle>
+                        </div>
+                        <ItemDescription className='text-xl text-black font-bold'>
+                          {nalozi.dodatniTroskovi}€
+                        </ItemDescription> 
+                      </div>
+                    
+                    <div className='w-full bg-blue-100 rounded-xl p-3 flex flex-col gap-2'>
+                      <ItemTitle className='text-xl text-black font-medium'>
+                        Opis dodatne naplate za proizvod*
+                      </ItemTitle>
+                      <ItemDescription className='md:text-base text-sm h-auto'>
+                        {nalozi.dodatniTroskoviNapomena}
+                      </ItemDescription>
+                    </div>
+                    </>
+                    :null}
+                  </section>
+
+
+                  <section className='flex flex-col gap-1 mt-2'>
+                    <div className='flex gap-2'>
+                      {nalozi.stanjeNaloga === 'uradjen' ? 
+                      <ItemTitle>Nalog je urađen.</ItemTitle> 
+                      : <ItemTitle>Nalog nije urađen.</ItemTitle> 
+                      }
+
+                      <ItemTitle>/ {nalozi.datum}</ItemTitle>
+                      
+                    </div>
+                  </section>
+              </ItemContent>
+
+              <ItemActions className='bg-[#f6f1ff] rounded-2xl px-5 flex flex-row items-center justify-center'>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link href={`/tus-kabine-nalozi/${nalozi._id}`} target="_blank">
+                        <Button variant="ghost" size="icon" className="rounded-full cursor-pointer hover:bg-gray-300">
+                            <Pencil />
+                        </Button>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Promeni nalog</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  {nalozi.stanjeNaloga === 'nijeUradjen' 
+                  ? <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="rounded-full cursor-pointer hover:bg-gray-300"
+                        onClick={()=> handlePromenaStanjaNaloga(nalozi._id)}>
+                            <Check />
+                            
+                      </Button>
+                      
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Uradjen nalog</p>
+                    </TooltipContent>
+                  </Tooltip> 
+                  : <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="rounded-full cursor-pointer hover:bg-gray-300"
+                        onClick={()=> handlePromenaStanjaNalogaNijeUradjen(nalozi._id)}>
+                            <Ban />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Promeni u ne uradjen nalog</p>
+                    </TooltipContent>
+                  </Tooltip> }
+
+                  
+
+                  <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button onClick={()=> deleteNalog(nalozi._id)} variant="ghost" size="icon" className="rounded-full cursor-pointer hover:bg-gray-300">
+                      <X />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Izbriši nalog</p>
+                  </TooltipContent>
+                </Tooltip>
+                  
+                  
                 
-                <ItemDescription className='text-lg text-black font-bold'>
-                  {`Okov: ${nalozi.bojaOkova}`}
-                </ItemDescription>
-                <ItemDescription className='text-lg text-black font-bold'>
-                  {`Staklo: ${nalozi.bojaStakla}`}
-                </ItemDescription>
-                <ItemDescription className='text-lg text-black font-bold'>
-                  {nalozi.montaza == "da" ? "Montira se" : "Bez montaže" }
-                </ItemDescription>
-                <ItemDescription className='text-sm text-black font-normal pr-5'>
-                  {nalozi.napomena != '' ? `Napomena: ${nalozi.napomena}` : null}
-                </ItemDescription>
-                <ItemTitle>{nalozi.datum}</ItemTitle>
-            </ItemContent>
-            <ItemActions>
-                <Link href={`/nalozi/${nalozi.id}`} target="_blank">
-                  <Button variant="ghost" size="icon" className="rounded-full cursor-pointer">
-                      <Pencil />
-                  </Button>
-                </Link>
-                <Button variant="ghost" size="icon" className="rounded-full cursor-pointer">
-                    <Check />
-                </Button>
-                <Button variant="ghost" size="icon" className="rounded-full cursor-pointer">
-                    <X />
-                </Button>
             
-            </ItemActions>
-            </Item>
-        
+              </ItemActions>
+              </main>
+              </Item>
+              </CollapsibleContent> 
+            </Collapsible>
+       
         </ItemGroup>
   )
 }
 
 
-export async function NalogKabinaCardZaObjekat({nalog}) {
-  //console.log("NALOG KARTICA DATA JE:",nalozi.data)
 
-  return (
-    <div>
-      <ItemGroup className="w-full">
-        
-            <Item key={nalog.ime} variant="outline" className="w-full">
-            
-            <ItemContent className="gap-1">
-                <ItemTitle className='text-[18px]'>{nalog.ime}</ItemTitle>
-                <ItemTitle>{nalog.telefon}</ItemTitle>
-                <ItemDescription className='text-xl text-black font-bold'>
-                  {`${nalog.proizvod} Širina:${nalog.sirina}cm Dužina:${nalog.duzina}cm`}
-                </ItemDescription>
-                <ItemDescription className='text-xl text-black font-bold'>
-                  {nalog.obrada}
-                </ItemDescription>
-                <ItemTitle>{nalog.datum}</ItemTitle>
-            </ItemContent>
-            <ItemActions>
-                <Link href={`/nalozi/${nalog.id}`} target="_blank">
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                      <Pencil />
-                  </Button>
-                </Link>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                    <Check />
-                </Button>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                    <X />
-                </Button>
-            
-            </ItemActions>
-            </Item>
-        
-        </ItemGroup>
-    </div>
-  )
-}
+
+
 
 export default NalogKabinaCard
+
+
+
+
+

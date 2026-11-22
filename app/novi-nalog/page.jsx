@@ -1,13 +1,28 @@
 import React from 'react'
-import NoviNalogForma from '../../components/forms/NoviNalogForma'
-import NoviNalogForma2 from '../../components/forms/NoviNalogForma2'
+import {FormProviderCreateCourse} from '../../components/forms/forms' 
+import {NoviNalog2} from '../../components/forms/NoviNalogForma2'
+import { fetchKlijenti } from '../../actions/action'
 
-function NoviNalogPage() {
+async function getKlijenti() {
+  const res = await fetchKlijenti();
+  return res.json();
+}
+
+
+async function NoviNalogPage() {
+  const klijenti = await getKlijenti(); // klijenti je array of objects
+
   return (
     <div className='w-full'>
       <div className='max-w-[1650px] mx-auto'>
-        <h1>Novi Nalog</h1>
-        <NoviNalogForma/>
+        <FormProviderCreateCourse>
+          <div className='px-5'>
+            
+            <NoviNalog2 klijenti={klijenti} />
+          </div>
+        
+      </FormProviderCreateCourse>
+
       </div>
 
     

@@ -8,15 +8,12 @@
     "obrada": "KP obrada",
     "sirina": 150,
     "duzina": 90,
-    "rupe": [
+    "rupeProizvoda": [
       {
-        "fiRupe": "rupa-10mm"
-      },
-      {
-        "fiRupe": "rupa-12mm"
+        "fiRupeProizvoda": "rupa-12mm",
+        "brojRupaProizvoda": 10
       }
-    ],
-    "brojRupa": 10
+    ]
   },
   {
     "id": 2,
@@ -27,15 +24,12 @@
     "obrada": "KP obrada",
     "sirina": 130,
     "duzina": 60,
-    "rupe": [
-      {
-        "fiRupe": "rupa-12mm"
-      },
-      {
-        "fiRupe": "rupa-12mm"
-      }
-    ],
-    "brojRupa": 3
+    "rupeProizvoda": [
+          {
+            "fiRupeProizvoda": "rupa-12mm",
+            "brojRupaProizvoda": 10
+          }
+        ]
   },
   {
     "id": 3,
@@ -53,7 +47,25 @@
       {
         "fiRupe": "rupa-20mm"
       }
+    ]
+  },
+  {
+    "ime": "Nikola Knezevic",
+    "telefon": "06031707070",
+    "proizvod": [
+      {
+        "imeProizvoda": "flot4mm",
+        "obradaProizvoda": "kaljeno",
+        "sirinaProizvoda": "50",
+        "duzinaProizvoda": "120",
+        "rupeProizvoda": [
+          {
+            "fiRupeProizvoda": "rupa-12mm",
+            "brojRupaProizvoda": 10
+          }
+        ]
+      }
     ],
-    "brojRupa": 3
+    "id": 4
   }
 ]

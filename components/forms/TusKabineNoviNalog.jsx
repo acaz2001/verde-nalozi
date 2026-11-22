@@ -1,7 +1,7 @@
 'use client'
-import React from 'react'
+import React, { Suspense, useEffect } from 'react'
 import { useState } from 'react'
-import { Controller, useForm } from "react-hook-form"
+import { Controller, useForm, useWatch } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -22,7 +22,7 @@ import {
   FieldLegend,
   FieldTitle 
 } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import { Input } from "../../components/ui/input"
 import {
   InputGroup,
   InputGroupAddon,
@@ -44,8 +44,12 @@ import {
 } from "@/components/ui/radio-group"
 import { fi } from 'zod/locales'
 import Image from 'next/image'
-
-
+import { toast } from "sonner"
+import { redirect } from 'next/navigation'
+//import { useRouter } from 'next/compat/router'
+import moment from 'moment';
+import { DevTool } from '@hookform/devtools'
+import {Skeleton} from '../ui/skeleton'
 
 const modeliKabina = [
   { label: "Model V01", value: "v01", image:"/Tus Kabina 3.jpg", cenaBezMontaze: 60, cenaSaMontazom: 90, cenaStaklaBojaBezMontaze: 90, cenaStaklaBojaMontaza: 120, cenaOkova: 100, cenaOkovaBoja: 120 },
@@ -87,9 +91,19 @@ const montaza = [
   }
 ]
 
+//let now = new Date();
+moment.locale('sr')
+let date = moment();
+let now = date.format("MMMM DD YYYY")
+let mesec = date.format("MMMM")
+
+console.log("Datum JE:",now);
+
 
 
 function TusKabineNoviNalog() {
+  //const router = useRouter()
+
   const [seleccedValue1,setSelectedValue1]=useState('v01');
   const [selectedItem, setSelectedItem]=useState('v01');
   const [duzina, setDuzina] = useState(0);
@@ -98,35 +112,44 @@ function TusKabineNoviNalog() {
   const [bojaStaklaState,setBojaStaklaState]=useState('');
   const [bojaOkovaState,setBojaOkovaState]=useState('');
   const [montazaState,setMontazaState]=useState('');
+  const [dodatniTrosak, setDodatniTrosak] = useState(0);
+  const [brojKabinaState, setBrojKabinaState] = useState(1)
 
 
+
+  console.log('selectedItem', selectedItem);
+  
 
   const objectInArray = modeliKabina.filter(obj => {  //variable koji cuva podatke izabranog proizvoda
     return obj.value === selectedItem 
   })
   const obj = objectInArray.map((m)=> m);
 
-  const cenaKabine = montazaState == 'da' ? 
+  let cenaKabine = montazaState == 'da' ? 
     objectInArray[0].cenaSaMontazom * (((sirina/100) * (visina/100)) + ((duzina/100) * (visina/100))) :
     objectInArray[0].cenaBezMontaze * (((sirina/100) * (visina/100)) + ((duzina/100) * (visina/100)));
 
-  const cenaKabineBoja = montazaState == 'da' ? 
+  let cenaKabineBoja = montazaState == 'da' ? 
     objectInArray[0].cenaStaklaBojaMontaza * (((sirina/100) * (visina/100)) + ((duzina/100) * (visina/100))) :
     objectInArray[0].cenaStaklaBojaBezMontaze * (((sirina/100) * (visina/100)) + ((duzina/100) * (visina/100))); 
     
-    const ukupnaCena = (bojaStaklaState == 'providno' ? cenaKabine :
+    let ukupnaCena = (bojaStaklaState == 'providno' ? cenaKabine :
       cenaKabineBoja
     ) 
     
-    const ukupnaCenaKabine = bojaOkovaState == 'sivo' || bojaOkovaState == '' ? 
-      (ukupnaCena + objectInArray[0].cenaOkova) :
-     (ukupnaCena + objectInArray[0].cenaOkovaBoja)
+    let ukupnaCenaKabine = bojaOkovaState == 'sivo' || bojaOkovaState == '' ? 
+      ((ukupnaCena + objectInArray[0].cenaOkova +dodatniTrosak ) * brojKabinaState) :
+     ((ukupnaCena + objectInArray[0].cenaOkovaBoja+ dodatniTrosak) * brojKabinaState)
+
+     const [cenaState, setCenaState] = useState(ukupnaCenaKabine)
+
+     console.log("ukupnaCenaKabine",objectInArray[0].image);
+     
+
 
   //const map = modeliKabina.map((m) => m.value);
   //const res = map.filter((f) => f.includes('v03'))
   //console.log("M JE:" + obj[0].image )
-
-  console.log("seleccedValue1:"+ montazaState)
 
     const form = useForm ({ defaultValues: {
         ime: "",
@@ -135,30 +158,36 @@ function TusKabineNoviNalog() {
         sirina: 0,
         duzina: 0,
         visina: 200,
+        brojKabina: 1,
         bojaStakla: "providno",
         bojaOkova: "sivo",
         montaza: "da",
-        napomena: ""
+        napomena: "",
+        datum: now,
+        cena: ukupnaCenaKabine,
+        dodatniTroskovi: 0,
+        dodatniTroskoviNapomena: '',
+        stanjeNaloga: 'nijeUradjen'
 
     }})
+    const {
+      register,
+      watch,
+      formState: { errors },
+      handleSubmit,
+      reset,
+      setValue
+    } = useForm()
 
-    {/*
-      const onSubmit = async (data) => {
-      // async request which may result error
-      try {
-          const res = JSON.stringify(data)
-          console.log("DATA KABINE JE:" + res)
-          // await fetch()
-      } catch (e) {
-          setError("root.serverError", {
-          type: e.status,
-          message: e.message,
-          })
-      }
-      }
-    */}
+    const watchCena = form.watch("cena")
+    console.log("Watch je:",watchCena)
+    
+    const watchBrojKabina = parseInt(form.watch("brojKabina"))
+    console.log("watchBrojKabina:", brojKabinaState );
+
 
     const onSubmit = async (data) => {
+      
       const res = await fetch("api/tus-kabine-nalozi", {
         method: "POST",
         body: JSON.stringify(data),
@@ -169,17 +198,45 @@ function TusKabineNoviNalog() {
       } );
   
       const result = await res.json();
+      const obj = JSON.stringify(result)
       if (!res.ok) {
         // response status is not 2xx
         alert("Submitting form failed!");
         return;
       }
-  
-      console.log("DATA JE: "+ data)
+      
+      //setValue("cena", ukupnaCenaKabine)
+      toast("Nalog za tus kabinu je uspesno napravljen.", { position: "bottom-right" });
+      //revalidatePath('/tus-kabine-nalozi')
+      redirect(`/tus-kabine-nalozi?query=${mesec}`)
+      //form.reset()
+      console.log("DATAS JE:" + obj)
     }
 
+    //console.log("FORMA JE", form.setValue("cena", cenaState))
+    useEffect(()=>{
+      setCenaState(ukupnaCenaKabine)
+      form.setValue("cena", ukupnaCenaKabine)  
+        
+    },[ukupnaCenaKabine])
+
+    useEffect(() => {
+      setVisina(200)
+    },[])
+
+    const watchDodatniTroskovi = parseInt(form.watch('dodatniTroskovi'))
+
+    
+
+  
+    console.log('dodatniTrosak', dodatniTrosak);
+    console.log('selectedItem', selectedItem);
+        
+
     return (
-        <form onSubmit={form.handleSubmit(onSubmit)} className='w-full flex flex-col items-start gap-5'>
+      <>
+        <form onSubmit={form.handleSubmit(onSubmit)} 
+        className='w-full flex flex-col items-start gap-5'>
             <FieldGroup>
             <Controller
               name="ime"
@@ -217,6 +274,7 @@ function TusKabineNoviNalog() {
                     aria-invalid={fieldState.invalid}
                     placeholder="Unesi broj telefona"
                     autoComplete="telefon"
+                    type="text"
                   />
                   <FieldDescription>
                     
@@ -249,9 +307,13 @@ function TusKabineNoviNalog() {
                   <Select
                     name={field.name}
                     value={field.value}
-                    onValueChange = {field.onChange}
+                    onValueChange = {(value) => {
+                      field.onChange(value)
+                      setSelectedItem(value)
+                    }
+                    }
                     //onValueChange={(value) => {setSelectedValue1(String(value))}}
-                    defaultValue="v01"
+                    
                   >
                     <SelectTrigger
                       id="form-rhf-select-modelKabine"
@@ -261,7 +323,6 @@ function TusKabineNoviNalog() {
                       <SelectValue placeholder="Izaberi" />
                     </SelectTrigger>
                     <SelectContent position="item-aligned">
-                      <SelectItem value="auto">Auto</SelectItem>
                       <SelectSeparator />
                       {modeliKabina.map((model) => (
                         <SelectItem key={model.value} value={model.value} >
@@ -270,10 +331,10 @@ function TusKabineNoviNalog() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <ModelKabine fieldValue={field.value} 
-                  image={objectInArray[0].image}
+                  <ModelKabine fieldValue={selectedItem} 
+                  image={selectedItem}
                   />
-                {setSelectedItem(field.value)}
+                {}
                 </Field>
                 
               )}
@@ -296,11 +357,15 @@ function TusKabineNoviNalog() {
                     placeholder="Unesi sirina:"
                     autoComplete="off"
                     type = "number"
+                    onChange={(e) => {
+                      field.onChange(e.target.value)
+                      setSirina(parseInt(e.target.value))
+                    }}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
-                  {setSirina(field.value)}
+                  {}
                 </Field>
               )}
             />
@@ -322,11 +387,14 @@ function TusKabineNoviNalog() {
                     placeholder="Unesi duzina:"
                     autoComplete="off"
                     type = "number"
+                    onChange={(e) => {
+                      field.onChange(e.target.value)
+                      setDuzina(parseInt(e.target.value))
+                    }}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
-                  {setDuzina(field.value)}
                 </Field>
               )}
             />
@@ -348,11 +416,44 @@ function TusKabineNoviNalog() {
                     placeholder="Unesi visina:"
                     autoComplete="off"
                     type = "number"
+                    onChange={(e) => {
+                      field.onChange(e.target.value)
+                      setVisina(parseInt(e.target.value))
+                    }}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
-                  {setVisina(field.value)}
+                </Field>
+                
+              )}
+            />
+            <Controller
+              name="brojKabina"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-brojKabina">
+                    Količina kabina:
+                  </FieldLabel>
+                  <FieldDescription>
+                      Unesi određen broj kabina po komadu.
+                  </FieldDescription>
+                  <Input
+                    {...field}
+                    id="form-rhf-brojKabina"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi brojKabina:"
+                    autoComplete="off"
+                    type = "number"
+                    onChange={(e) => {
+                      field.onChange(e.target.value)
+                       setBrojKabinaState(parseInt(e.target.value))
+                    }}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
                 
               )}
@@ -378,7 +479,10 @@ function TusKabineNoviNalog() {
                   <Select
                     name={field.name}
                     value={field.value}
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => {
+                      field.onChange(value)
+                      setBojaStaklaState(value)
+                    }}
                   >
                     <SelectTrigger
                       id="form-rhf-select-bojaStakla"
@@ -397,7 +501,7 @@ function TusKabineNoviNalog() {
                       ))}
                     </SelectContent>
                   </Select>
-                  {setBojaStaklaState(field.value)}
+                  
                 </Field>
               )}
             />
@@ -422,7 +526,10 @@ function TusKabineNoviNalog() {
                   <Select
                     name={field.name}
                     value={field.value}
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => {
+                      field.onChange(value)
+                      setBojaOkovaState(value)
+                    }}
                   >
                     <SelectTrigger
                       id="form-rhf-select-bojaOkova"
@@ -441,7 +548,6 @@ function TusKabineNoviNalog() {
                       ))}
                     </SelectContent>
                   </Select>
-                  {setBojaOkovaState(field.value)}
                 </Field>
               )}
             />
@@ -457,7 +563,10 @@ function TusKabineNoviNalog() {
                     <RadioGroup
                         name={field.name}
                         value={field.value}
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                          field.onChange(value)
+                          setMontazaState(value)
+                        }}
                         className='cursor-pointer'
                     >
                         {montaza.map((m) => (
@@ -478,7 +587,6 @@ function TusKabineNoviNalog() {
                         ))}
                     </RadioGroup>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                    {setMontazaState(field.value)}
                     </FieldSet>
                 )}
             />
@@ -490,23 +598,207 @@ function TusKabineNoviNalog() {
                   <FieldLabel htmlFor="form-rhf-textarea-napomena">
                     Dodaj napomenu:
                   </FieldLabel>
+                  <FieldDescription>
+                    Ukoliko imate dodatnih napomena za proizvod ili sličnih 
+                    zapisa, napišite u ovo polje.
+                  </FieldDescription>
                   <Textarea
                     {...field}
                     id="form-rhf-textarea-napomena"
                     aria-invalid={fieldState.invalid}
                     placeholder="Napiši napomenu ovde..."
+                    type="text"
                     className="min-h-[120px]"
                   />
-                  <FieldDescription>
-                    Ukoliko imate dodatnih napomena za proizvod ili sličnih 
-                    zapisa, napišite u ovo polje.
-                  </FieldDescription>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )} </Field>
               )}
             />
-            
+          <div className='hidden'>
+            <Controller
+              name="datum"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-datum">
+                    datum:
+                  </FieldLabel>
+                  <FieldDescription>
+                      Unesi dimenziju u centimetrima.
+                  </FieldDescription>
+                  <Input
+                    {...field}
+                    id="form-rhf-datum"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi datum:"
+                    autoComplete="off"
+                    type = "string"
+                    defaultValue={now}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                  
+                </Field>
+                
+              )}
+            />
+          </div>
+          <div className='hidden'>
+          
+          <Controller
+              name="stanjeNaloga"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  data-invalid={fieldState.invalid}
+                >
+                  <FieldContent>
+                    <FieldLabel htmlFor="form-rhf-select-stanjeNaloga">
+                      Boja okova:
+                    </FieldLabel>
+                    <FieldDescription>
+                      Izaberi boju okova.
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                  <Select
+                    name={field.name}
+                    value={'nijeUradjen'}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger
+                      id="form-rhf-select-stanjeNaloga"
+                      aria-invalid={fieldState.invalid}
+                      className="min-w-[120px]"
+                    >
+                      <SelectValue placeholder="Izaberi" />
+                    </SelectTrigger>
+                    <SelectContent position="item-aligned">
+                      <SelectItem value="nijeUradjen">Nije Uradjen</SelectItem>
+                      <SelectSeparator />
+                      
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
+            />
+            </div>
+
+            <div>
+              <Controller
+              name="dodatniTroskovi"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-dodatniTroskovi" className=''>
+                    Dodatni troškovi
+                  </FieldLabel>
+                  <FieldDescription className=''>
+                      Unesite ako imate neke dodatne stvari da naplatite na kabini(npr. plastifikacija, iznošenje na neki sprat...)
+                  </FieldDescription>
+                  <Input
+                    {...field}
+                    //{...register("cena")}
+                    id="form-rhf-dodatniTroskovi"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi dodatnu cenu:"
+                    autoComplete="off"
+                    type = "number"
+                    onChange={(e) => {
+                      field.onChange(e.target.value);
+                        setDodatniTrosak(parseInt(e.target.value))
+                      
+                    }}
+                    className=''
+                    //defaultValue={ukupnaCenaKabine}
+                    
+                  />
+                  {/* {setCenaState(field.value)} */}
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                  
+                </Field>
+              )}/>
+              
+            </div>
+
+            {watchDodatniTroskovi <= 0 ? null : 
+          
+              <div>
+                <Controller
+                name="dodatniTroskoviNapomena"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="form-rhf-textarea-dodatniTroskoviNapomena">
+                      Napomena za dodatne troškove:
+                    </FieldLabel>
+                    <Textarea
+                      {...field}
+                      id="form-rhf-textarea-dodatniTroskoviNapomena"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Napiši napomenu ovde..."
+                      type="text"
+                      className="min-h-[120px]"
+                    />
+                    <FieldDescription>
+                      Ukoliko imate dodatnih napomena za proizvod ili sličnih 
+                      zapisa, napišite u ovo polje.
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )} </Field>
+                )}
+              />
+              </div>
+            }
+
+            <div className=''>
+            <Controller
+              name="cena"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-cena" className='hidden'>
+                    cena:
+                  </FieldLabel>
+                  <FieldDescription className='hidden'>
+                      Unesi dimenziju u centimetrima.
+                  </FieldDescription>
+                  <Input
+                    {...field}
+                    //{...register("cena")}
+                    id="form-rhf-cena"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Unesi cena:"
+                    autoComplete="off"
+                    type = "number"
+                    className='hidden'
+                    //defaultValue={ukupnaCenaKabine}
+                    value={ukupnaCenaKabine}
+                  />
+                  {/* {setCenaState(field.value)} */}
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                  
+                </Field>
+                
+              )}
+            />
+            <div>
+            {montazaState == 'da' ? 
+              <p>Cena je:{ukupnaCenaKabine}€ sa montažom.</p> : 
+              <p>Cena je :{ukupnaCenaKabine}€ bez montaže.</p>}
+              {/* <p>CEna state:{ukupnaCenaKabine}</p> */}
+              
+            </div>
+          </div>
           </FieldGroup>
           <div className='flex flex-row gap-2'>
             <Button type="submit" className="cursor-pointer">Napravi Nalog</Button>
@@ -514,15 +806,11 @@ function TusKabineNoviNalog() {
               Resetuj
             </Button>
           </div>
-          <div>
-            {montazaState == 'da' ? 
-              <p>Cena je:{ukupnaCenaKabine} evra sa montažom.</p> : 
-              <p>Cena je :{ukupnaCenaKabine} evra bez montaže.</p>}
-          </div>
+          
         
         </form>
-
-        
+        <DevTool control={form.control}/>
+       </> 
     )
 }
 
@@ -537,9 +825,11 @@ function ModelKabine({fieldValue,image}) {
   
 
   return(
-    <div>
-      <Image src={image} alt='image' width={500} height={500} className='rounded-2xl'/>
-    </div>
+    <Suspense fallback={<Skeleton className="aspect-video w-full"/>}>
+      <div>
+        <Image src={`/${image}.jpg`} alt='image' width={500} height={500} className='rounded-2xl'/>
+      </div>
+    </Suspense>
   )
 }
 

@@ -44,7 +44,8 @@ import {
   ItemTitle,
 } from "@/components/ui/item"
 import { X } from 'lucide-react';
-import { id } from "zod/locales";
+import { fi, id } from "zod/locales";
+import { DevTool } from "@hookform/devtools";
 
 
 
@@ -134,9 +135,15 @@ export function NoviNalogForma() {
     defaultValues: {
       ime: "",
       telefon: "",
-      proizvod2: [{imeProizvoda:"",obradaProizvoda: "", sirinaProizvoda: 0, duzinaProizvoda: 0,
+      proizvod: [{imeProizvoda:"",obradaProizvoda: "", sirinaProizvoda: 0, duzinaProizvoda: 0,
         rupeProizvoda: [{fiRupeProizvoda: "", brojRupaProizvoda: 0}]}],
     },
+  })
+  const { control, register, handleSubmit, reset, watch, formState: { errors, isSubmitting } } = form;
+  
+  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+    name: "proizvod",
+    control
   })
   const [izabraniProizvod, setizabraniProizvod] = useState({
     id: null
@@ -150,39 +157,14 @@ export function NoviNalogForma() {
     }));
    
   };
-
-
-
- 
-
-  const { control, register, handleSubmit, reset, watch, formState: { errors, isSubmitting } } = form;
-
-
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
-    control: form.control,
-    name: "rupa",
-  })
-
-  const proizvodiArray = useFieldArray({
-    control: form.control,
-    name: "proizvod2",
-  })
-
-  const proizvodiArrayRupe = useFieldArray({
-    control: form.control,
-    name: "rupeProizvoda",
-    
-  })
-
-  console.log("OVO JE PROIZVODI ARRAY" + proizvodiArrayRupe.fields[0])
   
 
   
 
 
-  //function onSubmit(data) {
-    //console.log("data je:",data)
-  //}
+  // function onSubmit(data) {
+  //   console.log("data je:",data)
+  // }
 
 
     
@@ -208,7 +190,7 @@ export function NoviNalogForma() {
 
 
   const rupaValues = watch(form);
-  const proizvod2Values = watch("proizvodiArray");
+  console.log("FIELDSSS" , fields[0].rupeProizvoda)
 
 
   return (
@@ -273,238 +255,198 @@ export function NoviNalogForma() {
                 </Field>
               )}
             />
-            
-          
-
             {/*PROIZVOD2 */}
-            
-           
-          <FieldGroup>
-            {proizvodiArray.fields.map((item, index) => {
-                      
-                    const fieldError = errors.proizvod2?.[index]?.imeProizvoda 
-            return (
+            <FieldGroup>
               
-              
-              <div key={item.id} className="flex flex-col items-start w-full gap-5 border-b-amber-400 border-b-1 pb-5">   
-                <div className="flex flex-row justify-between w-full gap-3 "> 
-                  <Controller
-                  
+              {fields.map((field, index) => (
+                <div key={field.id} className="flex flex-col items-start w-full gap-5 border-b-amber-400 border-b-1 pb-5">
+                  <h1 className="text-xl font-medium">Proizvod: {index+1}</h1>
+                  <section className="flex flex-row w-full justify-between w-full gap-3 ">
+                    <Controller
                     control={form.control}
-                    name={`proizvod2.${index}.imeProizvoda`}
-                    render={({ field }) => (
-                      
-                        <Field data-invalid={fieldError ? true : undefined}>
-                        <FieldLabel>Proizvod {index + 1}</FieldLabel>
-
+                    name={`proizvod.${index}.imeProizvoda`}
+                    render={({ field, fieldState  }) => (
+                      <div className="flex flex-col gap-2 w-full">
+                        <FieldLabel htmlFor={`form-rhf-input-proizvod.${index}-imeProizvoda`}>
+                          {`Proizvod ${index+1}`}
+                        </FieldLabel>
                         <Select
-                            name = {field.name}
-                            value={field.value}
-                            onValueChange={field.onChange}
+                          name = {field.name}
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          
                         >
-                            <SelectTrigger aria-invalid={fieldError ? true : undefined}>
+                          <SelectTrigger aria-invalid={fieldState.invalid ? true : undefined}>
                             <SelectValue placeholder="Izaberi proizvod" />
-                            </SelectTrigger>
-
-                            <SelectContent>
-                            {proizvodi.map((p) => (
-                                <SelectItem key={p.value} value={p.value}>
-                                {p.label}
-                                </SelectItem>
-                            ))}
-                            </SelectContent>
+                          </SelectTrigger>
+                          <SelectContent>
+                          {proizvodi.map((p) => (
+                              <SelectItem key={p.value} value={p.value}>
+                              {p.label}
+                              </SelectItem>
+                          ))}
+                          </SelectContent>
                         </Select>
-
-                        {fieldError && <FieldError>{fieldError.message}</FieldError>}
-                        </Field>
-                    )}
-                    />
+                      </div>
+                    )}/>
                     <Controller
-                      control={form.control}
-                      name={`proizvod2.${index}.obradaProizvoda`}
-                      render={({ field }) => (
-                        
-                          <Field data-invalid={fieldError ? true : undefined}>
-                          <FieldLabel>Obrada za {index + 1} proizvod</FieldLabel>
-
-                          <Select
-                              name = {field.name}
-                              value={field.value}
-                              onValueChange={field.onChange}
-                          >
-                              <SelectTrigger aria-invalid={fieldError ? true : undefined}>
-                              <SelectValue placeholder="Izaberi obradu" />
-                              </SelectTrigger>
-
-                              <SelectContent>
-                              {obrada.map((o) => (
-                                  <SelectItem key={o.value} value={o.value}>
-                                  {o.label}
-                                  </SelectItem>
-                              ))}
-                              </SelectContent>
+                    control={form.control}
+                    name={`proizvod.${index}.obradaProizvoda`}
+                    render={({ field, fieldState  }) => (
+                      <div className="flex flex-col gap-2 w-full">
+                        <FieldLabel htmlFor={`form-rhf-input-proizvod.${index}-obradaProizvoda`}>
+                          {`Obrada za ${index+1}. proizvod`}
+                        </FieldLabel>
+                        <Select
+                          name = {field.name}
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                        <SelectTrigger aria-invalid={fieldState.invalid ? true : undefined}>
+                          <SelectValue placeholder="Izaberi obradu." />
+                        </SelectTrigger>
+                        <SelectContent>
+                        {obrada.map((p) => (
+                            <SelectItem key={p.value} value={p.value}>
+                            {p.label}
+                            </SelectItem>
+                        ))}
+                        </SelectContent>
                           </Select>
-
-                          {fieldError && <FieldError>{fieldError.message}</FieldError>}
-                          </Field>
-                    )}
-                    />
+                      </div>
+                    )}/>
                     <Controller
-                      //key={item.id}
-                      name={`proizvod2.${index}.sirinaProizvoda`}
-                      control={form.control}
-                      render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                          <FieldLabel htmlFor="form-rhf-input-sirinaProizvoda">
+                    control={form.control}
+                    name={`proizvod.${index}.sirinaProizvoda`}
+                    render={({ field, fieldState  }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="form-rhf-input-proizvod-sirinaProizvoda">
                              {`Širina za ${index+1} proizvod`}
-                          </FieldLabel>
-                          <Input
+                        </FieldLabel>
+                        <Input
                             {...field}
-                            id="form-rhf-input-sirinaProizvoda"
+                            id="form-rhf-input-proizvod-sirinaProizvoda"
                             aria-invalid={fieldState.invalid}
                             placeholder="Unesi širinu"
                             autoComplete="sirina"
-                           
+                            type="number"
                           />
-                          <FieldDescription>
+                        <FieldDescription>
                             Unesi dimenziju u centimetrima
                           </FieldDescription>
                           {fieldState.invalid && (
                             <FieldError errors={[fieldState.error]} />
-                          )}
-                        </Field>
-                      )}
-                    />
+                        )}
+                      </Field>
+                    )}/>
                     <Controller
-                      name={`proizvod2.${index}.duzinaProizvoda`}
-                      control={form.control}
-                      render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                          <FieldLabel htmlFor="form-rhf-input-duzinaProizvoda">
-                            {`Dužina za ${index+1} proizvod`}
-                          </FieldLabel>
-                          <Input
+                    control={form.control}
+                    name={`proizvod.${index}.duzinaProizvoda`}
+                    render={({ field, fieldState  }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="form-rhf-input-proizvod-duzinaProizvoda">
+                             {`Dužina za ${index+1} proizvod`}
+                        </FieldLabel>
+                        <Input
                             {...field}
-                            id="form-rhf-input-duzinaProizvoda"
+                            id="form-rhf-input-proizvod-duzinaProizvoda"
                             aria-invalid={fieldState.invalid}
-                            placeholder="Unesi dužinu"
+                            placeholder="Unesi širinu"
                             autoComplete="duzina"
+                            type="number"
                           />
-                          <FieldDescription>
+                        <FieldDescription>
                             Unesi dimenziju u centimetrima
                           </FieldDescription>
                           {fieldState.invalid && (
                             <FieldError errors={[fieldState.error]} />
-                          )}
-                        </Field>
-                      )}
-                    />
-                      <Button
-                              type="button"
-                              variant="destructive"
-                              onClick={() => proizvodiArray.remove(index)}
-                              //disabled={fields.length === 1}
-                              disabled={isSubmitting || proizvodiArray.fields.length === 1}
-                              className="mt-7"
-                          >
-                              Obriši
-                      </Button>
-                    </div>
-                    <FieldGroup>
+                        )}
+                      </Field>
+                    )}/>
 
-                      {proizvodiArrayRupe.fields.map((item2, index2) => {
-                        return (
-                          <div key={item2.id} className="flex flex-row">
-                            <Controller
-                            control={form.control}
-                            name={`proizvod2.${index2}.rupeProizvoda.fiRupeProizvoda`}
-                            render={({ field }) => (
-                          
-                            <Field data-invalid={fieldError ? true : undefined}>
-                            <FieldLabel>Rupa za {index2 + 1} proizvod</FieldLabel>
+                  </section>
 
-                            <Select
-                                name = {field.name}
-                                value={field.value}
-                                onValueChange={field.onChange}
-                            >
-                                <SelectTrigger aria-invalid={fieldError ? true : undefined}>
-                                <SelectValue placeholder="Izaberi fi rupe" />
-                                </SelectTrigger>
-
-                                <SelectContent>
-                                {rupe.map((r) => (
-                                    <SelectItem key={r.value} value={r.value}>
-                                    {r.label}
-                                    </SelectItem>
-                                ))}
-                                </SelectContent>
-                            </Select>
-
-                            {fieldError && <FieldError>{fieldError.message}</FieldError>}
-                            </Field>
-                      )}
-                      />
-                      <Controller
-                        name={`proizvod2.${index2}.rupeProizvoda.brojRupaProizvoda`}
+                  <div className="flex flex-row justify-between w-full gap-3 ">
+                      <section  className="flex flex-row justify-between w-full gap-3 ">
+                        <Controller
                         control={form.control}
-                        render={({ field, fieldState }) => (
+                        name={`proizvod.${index}.rupeProizvoda`}
+                        render={({ field, fieldState  }) => (
+                          <></>
+                        )}/>
+                        <Controller
+                        control={form.control}
+                        name={`proizvod.${index}.rupeProizvoda.fiRupeProizvoda`}
+                        render={({ field, fieldState  }) => (
+                        <div className="flex flex-col">
+                          <FieldLabel htmlFor="form-rhf-input-proizvod-brojRupaProizvoda">
+                                {`Fi Rupa za ${index+1} proizvod za Rupe`}
+                            </FieldLabel>
+                          <Select
+                            name = {field.name}
+                            value={field.value}
+                            onValueChange={field.onChange}
+                          >
+                          <SelectTrigger aria-invalid={fieldState.invalid ? true : undefined}>
+                            <SelectValue placeholder="Izaberi proizvod" />
+                          </SelectTrigger>
+                          <SelectContent>
+                          {rupe.map((p) => (
+                              <SelectItem key={p.value} value={p.value}>
+                              {p.label}
+                              </SelectItem>
+                          ))}
+                          </SelectContent>
+                          
+                            </Select>
+                        </div> 
+                        )}/>
+                        <Controller
+                        control={form.control}
+                        name={`proizvod.${index}.rupeProizvoda.brojRupaProizvoda`}
+                        render={({ field, fieldState  }) => (
                           <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor="form-rhf-input-brojRupaProizvoda">
-                              Broj rupa za {index2 + 1} proizvod
+                            <FieldLabel htmlFor="form-rhf-input-proizvod-brojRupaProizvoda">
+                                {`Broj Rupa za ${index+1} proizvod za Rupe`}
                             </FieldLabel>
                             <Input
-                              {...field}
-                              id="form-rhf-input-rupeProizvoda.brojRupaProizvoda"
-                              aria-invalid={fieldState.invalid}
-                              placeholder="Unesi broj rupa"
-                              autoComplete="sirina"
-                            />
+                                {...field}
+                                id="form-rhf-input-proizvod-brojRupaProizvoda"
+                                aria-invalid={fieldState.invalid}
+                                placeholder="Unesi broj rupa."
+                                autoComplete="brojRupa"
+                                type="number"
+                              />
                             <FieldDescription>
-                              
-                            </FieldDescription>
-                            {fieldState.invalid && (
-                              <FieldError errors={[fieldState.error]} />
+                                Unesi broj rupa po kolicini.
+                              </FieldDescription>
+                              {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
                             )}
+                             
                           </Field>
-                        )}
-                      />
-                      <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => proizvodiArrayRupe.append ({rupeProizvoda: []})}
-                          >
-                          Dodaj rupu
-                      </Button>
-                          </div>
-                        )
-                      })}
-                    </FieldGroup>
-                      
-                    
-                    
-                        
-                    
-               
-                
-              </div>
-              
-              
-            )}
-            
-            )}
-            <Button
+                          
+                        )}/>
+                      </section>
+
+                  </div>
+                 <Button
                 type="button"
                 variant="outline"
-                onClick={() => proizvodiArray.append ({imeProizvoda:"",obradaProizvoda: ""})}
+                onClick={() => append ({proizvod:[]})}
                 >
                 Dodaj proizvod
-            </Button>
-          </FieldGroup>
+            </Button> 
+                </div>
+              ))}
+            </FieldGroup>
             
-            {/*KRAJ PROIZVOD2 */}
+          
+            
+            
           </FieldGroup>
         </form>
+        <DevTool control={form.control}/>
       </CardContent>
 
 
@@ -523,66 +465,5 @@ export function NoviNalogForma() {
 }
 
 
-export function Proizvod () {
-  return (
-    <div>
-        <Controller
-          control={form.control}
-          name={`proizvod2.${index}.imeProizvod`}
-          render={({ field }) => (
-            
-              <Field data-invalid={fieldError ? true : undefined}>
-              <FieldLabel>Proizvod {index + 1}</FieldLabel>
-
-              <Select
-                  name = {field.name}
-                  value={field.value}
-                  onValueChange={field.onChange}
-              >
-                  <SelectTrigger aria-invalid={fieldError ? true : undefined}>
-                  <SelectValue placeholder="Izaberi rupu" />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                  {proizvodi.map((p) => (
-                      <SelectItem key={p.value} value={p.value}>
-                      {p.label}
-                      </SelectItem>
-                  ))}
-                  </SelectContent>
-              </Select>
-
-              {fieldError && <FieldError>{fieldError.message}</FieldError>}
-              </Field>
-          )}
-          />
-    </div>
-  )
-}
-
-const ProizvodRupe = () => {
-  const {
-      register,
-      control,
-      formState: { errors },
-    } = useForm()
-
-  const { append, remove, fields } = useFieldArray({
-    name: 'proizvodRupe',
-    control,
-  })
-
-  return (
-    <div>
-      {fields.map((chapter, chapterIndex) => {
-        return (
-          <div key={chapter.id}>
-              
-          </div>
-        )
-      } )}
-    </div>
-  )
-}
 
 export default NoviNalogForma

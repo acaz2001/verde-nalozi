@@ -1,29 +1,88 @@
 import React from 'react'
 import NalogKartica from './NalogKartica'
 
-function NalogContainer({nalozi,query}) {
-  const searchCountries = Array.isArray(nalozi) ? nalozi.filter((data) => {
-        return data.ime.toLowerCase().includes(query.toLowerCase()) //|| data.telefon.toString().toLowerCase().includes(query.toLowerCase());
-    }) : [];
-  
-  //const pages = nalozi.length;
-  //const perPage = Math.ceil(pages / 32)
-  //const start = (Number(currentPage) - 1) * perPage
-  //const end = start + perPage
-  //const entries = searchCountries.slice(start, end)
+function NalogContainer({nalozi,query,query2, aktivnostDugmeta}) {
 
-const s = searchCountries.map((nalog) => {nalog.ime})
+  const filterNalozi = nalozi.filter((word) => word.stanjeNaloga === 'nijeUradjen')
 
-  return (
-    <div>
-      {
-        Array.isArray(nalozi) && searchCountries.map((nalog) => {
-          return (
-            <NalogKartica key={nalog.id} nalozi={nalog} />      
-          )
-        })}
-    </div>
-  )
+  if(!aktivnostDugmeta) {
+      if (query && !query2 ) {     
+                
+                    const searchCountries1 = Array.isArray(nalozi) ? nalozi.filter((data) => {
+                    return data.datum.toLowerCase().includes(query.toLowerCase() )   
+                }) : [];
+                    
+                return (
+                    <div className='z-10'>
+                        {
+                        Array.isArray(nalozi) && searchCountries1.map((nalog) => {
+                        return (
+                            <NalogKartica key={nalog._id} nalozi={nalog} />      
+                        )
+                        })}
+                    </div>
+                )
+            } 
+    
+            if (query && query2) {
+                const searchCountries = Array.isArray(nalozi) ? nalozi.filter((data) => {
+                    return data.ime.toLowerCase().includes(query.toLowerCase() && query2.toLowerCase()) ||
+                    data.datum.toLowerCase().includes(query.toLowerCase() && query2.toLowerCase()) ||
+                    data.brojTelefona.toString().toLowerCase().includes(query.toLowerCase() && query2.toLowerCase()) ||
+                    data.ime.toLowerCase().includes(query.toLowerCase() && query2.toLowerCase())
+                }) : [];
+                
+                return (
+                    <div>
+                        {
+                        Array.isArray(nalozi) && searchCountries.map((nalog) => {
+                        return (
+                            <NalogKartica key={nalog._id} nalozi={nalog} />      
+                        )
+                        })}
+                    </div>
+                )
+            }
+  }
+  else {
+    if (query && !query2 ) {     
+                
+            const searchCountries1 = Array.isArray(filterNalozi) ? filterNalozi.filter((data) => {
+            return data.datum.toLowerCase().includes(query.toLowerCase() )   
+        }) : [];
+            
+        return (
+            <div className='z-10'>
+                {
+                Array.isArray(filterNalozi) && searchCountries1.map((nalog) => {
+                return (
+                    <NalogKartica key={nalog._id} nalozi={nalog} />      
+                )
+                })}
+            </div>
+        )
+    } 
+
+    if (query && query2) {
+        const searchCountries = Array.isArray(filterNalozi) ? filterNalozi.filter((data) => {
+            return data.ime.toLowerCase().includes(query.toLowerCase() && query2.toLowerCase()) ||
+            data.datum.toLowerCase().includes(query.toLowerCase() && query2.toLowerCase()) ||
+            data.brojTelefona.toString().toLowerCase().includes(query.toLowerCase() && query2.toLowerCase()) ||
+            data.ime.toLowerCase().includes(query.toLowerCase() && query2.toLowerCase())
+        }) : [];
+        
+        return (
+            <div>
+                {
+                Array.isArray(filterNalozi) && searchCountries.map((nalog) => {
+                return (
+                    <NalogKartica key={nalog._id} nalozi={nalog} />      
+                )
+                })}
+            </div>
+        )
+    }
+  }
 }
 
 export default NalogContainer

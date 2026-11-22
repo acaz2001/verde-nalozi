@@ -1,4 +1,5 @@
 import React from 'react'
+import { cn } from '@/lib/utils'
 
 export default function Kontent({children,className}) {
   return (
@@ -10,7 +11,7 @@ export default function Kontent({children,className}) {
 
 export function Naslov ({children,className}) {
     return (
-        <h1 className={`md:text-4xl text-3xl font-medium ${className}`}>{children}</h1>
+        <h1 className={`md:text-4xl text-2xl font-bold ${className}`}>{children}</h1>
     )
 }
 
@@ -29,6 +30,12 @@ export function PodebljanPodNaslov ({children,className}) {
 export function Tekst ({children,className}) {
     return (
         <h1 className={`md:text-2xl text-[22px] leading-[40px] ${className}`}>{children}</h1>
+    )
+}
+
+export function OpisTeksta ({children,className}) {
+    return (
+        <h1 className={`md:text-lg text-sm text-gray-500 ${className}`}>{children}</h1>
     )
 }
 
