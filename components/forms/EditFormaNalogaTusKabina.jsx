@@ -246,7 +246,7 @@ function EditFormaNalogaTusKabina({nalog}) {
     const onSubmit = async (data) => {
         console.log("FORM DATA:", data)
   console.log("MODEL KABINE:", data.modelKabine)
-      const res = await fetch(`http://localhost:3000/api/tus-kabine-nalozi/${params.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}api/tus-kabine-nalozi/${params.id}`, {
         method: "PUT",
         body: JSON.stringify(data),
         headers: {

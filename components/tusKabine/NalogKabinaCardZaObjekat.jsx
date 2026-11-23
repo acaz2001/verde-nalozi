@@ -20,7 +20,7 @@ export default function NalogKabinaCardZaObjekat({nalog}) {
   //console.log("NALOG KARTICA DATA JE:",nalog)
 
   const deleteNalog = async (nalog) => {
-    const response = await fetch(`http://localhost:3000/api/tus-kabine-nalozi/${nalog}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}api/tus-kabine-nalozi/${nalog}`, {
       method: 'DELETE',
     })
     

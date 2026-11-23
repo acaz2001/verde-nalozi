@@ -9,7 +9,7 @@ import path from "path";
 
 
 async function getNalogId(id) {
-  const res = await fetch(`http://localhost:3000/api/tus-kabine-nalozi/${id}`, 
+  const res = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}api/tus-kabine-nalozi/${id}`, 
     {method:"GET"});
   return res.json();
 }

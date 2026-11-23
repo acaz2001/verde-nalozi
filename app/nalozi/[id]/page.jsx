@@ -5,7 +5,7 @@ import { FormProviderCreateCourse } from '../../../components/forms/forms';
 
 
 async function getNalogId(id) {
-  const res = await fetch(`http://localhost:3000/api/nalozi/${id}`, {method:"GET"});
+  const res = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}api/nalozi/${id}`, {method:"GET"});
   return res.json();
 }
 

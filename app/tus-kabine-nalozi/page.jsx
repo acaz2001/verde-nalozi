@@ -23,7 +23,7 @@ let mesec = date.format("MMMM")
 
 
 async function getPosts() {
-  const res = await fetch("http://localhost:3000/api/tus-kabine-nalozi", {method:"GET"});
+  const res = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}api/tus-kabine-nalozi`, {method:"GET"});
   return res.json();
 }
 

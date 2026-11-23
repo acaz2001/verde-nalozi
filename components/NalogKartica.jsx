@@ -63,7 +63,7 @@ function NalogKartica({nalozi, key}) {
   const [open, setOpen] = React.useState(false)
 
   const deleteNalog = async (nalogId) => {
-    const response = await fetch(`http://localhost:3000/api/nalozi/${nalogId}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}api/nalozi/${nalogId}`, {
       method: 'DELETE',
     })
     const data = await response.json()
@@ -416,7 +416,7 @@ function NalogKartica({nalozi, key}) {
 
 export async function NalogKarticaZaObjekat({nalog}) {
   const deleteNalog = async (nalog) => {
-    const response = await fetch(`http://localhost:3000/api/nalozi/${nalog}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}api/nalozi/${nalog}`, {
       method: 'DELETE',
     })
     

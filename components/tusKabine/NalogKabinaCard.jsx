@@ -57,7 +57,7 @@ function NalogKabinaCard({nalozi}) {
 
 
   const deleteNalog = async (nalogId) => {
-    const response = await fetch(`http://localhost:3000/api/tus-kabine-nalozi/${nalogId}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}api/tus-kabine-nalozi/${nalogId}`, {
       method: 'DELETE',
     })
     const data = await response.json()

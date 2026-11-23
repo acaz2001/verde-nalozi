@@ -61,7 +61,7 @@ const params = useParams();
 
 const onSubmit = async (data) => {
     
-    const res = await fetch(`http://localhost:3000/api/klijenti/${params.id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}api/klijenti/${params.id}`, {
     method: "PUT",
     body: JSON.stringify(data),
     headers: {

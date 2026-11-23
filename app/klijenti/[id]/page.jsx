@@ -13,13 +13,13 @@ async function klijentId(id) {
 }
 
 async function getPosts() {
-  const res = await fetch("http://localhost:3000/api/nalozi", {method:"GET"});
+  const res = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}api/nalozi`, {method:"GET"});
   console.log("DS:", res);
   
   return res.json();
 }
 async function getPostsKabine() {
-  const res = await fetch("http://localhost:3000/api/tus-kabine-nalozi", {method:"GET"});
+  const res = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}api/tus-kabine-nalozi`, {method:"GET"});
   return res.json();
 } 
 
